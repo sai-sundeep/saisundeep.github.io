@@ -1,0 +1,16 @@
+---
+title: "Sai Sundeep Rayidi"
+image: profile.jpg
+about:
+  template: jolla
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/sai-sundeep-rayidi-7256b4245/
+    - icon: github
+      text: Github
+      href: https://github.com/sai-sundeep/sai-sundeep
+
+---
+
+Hi, I am Sai, I am a Computer Science graduate student at Virginia Tech. My interests include Data Analytics, Visualization and Machine Learning. 

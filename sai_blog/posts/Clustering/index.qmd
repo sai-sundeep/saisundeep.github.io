@@ -1,0 +1,9 @@
+---
+title: "Clustering"
+author: "Sai Sundeep Rayidi"
+date: "2023-10-05"
+categories: [clustering, code, scatter plot, analysis, visualization]
+image: "clustering.png"
+---
+
+This is a post with executable code.

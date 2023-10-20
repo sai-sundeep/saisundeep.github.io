@@ -1,0 +1,9 @@
+---
+title: "Linear and Non-Linear Regression"
+author: "Sai Sundeep Rayidi"
+date: "2023-10-13"
+categories: [regression, news, code, analysis, polynomial regression]
+image: "regression.png"
+---
+
+This is a post with executable code.

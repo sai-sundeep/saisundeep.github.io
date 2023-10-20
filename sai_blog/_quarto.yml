@@ -1,0 +1,38 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Sai's ML blog"
+  back-to-top-navigation: true
+  page-navigation: true
+  reader-mode: false
+  open-graph: true
+  page-footer: 
+    left: "Copyright 2023, Sai Sundeep Rayidi" 
+    right: 
+      - icon: github
+        href: https://github.com/sai-sundeep/sai-sundeep
+      - icon: linkedin 
+        href: https://www.linkedin.com/in/sai-sundeep-rayidi-7256b4245/
+    background: dark
+  navbar:
+    pinned: true
+    right:
+      - text: "About Me"
+        file: about.qmd
+      - icon: github
+        menu:
+          - text: Source Code
+            url:  https://github.com/sai-sundeep/sai-sundeep
+          - text: Report a Bug
+            url:  https://github.com/issues
+      - icon: linkedin
+        href: https://www.linkedin.com/in/sai-sundeep-rayidi-7256b4245/
+format:
+  html:
+    theme: sketchy
+    css: styles.css
+
+
+
