@@ -6,4 +6,6 @@ categories: [regression, news, code, analysis, polynomial regression]
 image: "regression.png"
 ---
 
-This is a post with executable code.
+This is a post on regression analysis on diamonds dataset.
+
+{{< include diamonds_regression.qmd >}}

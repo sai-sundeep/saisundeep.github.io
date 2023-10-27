@@ -1,0 +1,378 @@
+---
+jupyter: python3
+---
+
+```{python}
+#| collapsed: true
+#| ExecuteTime: {end_time: '2023-10-26T16:32:07.748105900Z', start_time: '2023-10-26T16:32:07.732195300Z'}
+#Import Packages
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+import seaborn as sns
+import warnings
+
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
+sns.set_theme(style="darkgrid")
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T15:52:31.912697Z', start_time: '2023-10-26T15:52:31.840067100Z'}
+diamonds = sns.load_dataset('diamonds')
+print(diamonds.shape)
+print(diamonds.describe())
+print(diamonds.head(10))
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T16:35:00.031495600Z', start_time: '2023-10-26T16:34:59.143356600Z'}
+sns.histplot(data=diamonds, x='price', kde=True)
+plt.title('Diamonds Dataset - Price Distribution')
+plt.ylabel("# of sales")
+plt.xlabel("Price")
+plt.grid('both')
+plt.show()
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T16:33:12.952332800Z', start_time: '2023-10-26T16:33:12.777618Z'}
+sns.countplot(data=diamonds, y='cut', order=diamonds['cut'].value_counts().index,
+              palette=sns.color_palette('flare', 10))
+plt.title('Diamonds Dataset - sales by cut type')
+plt.xlabel('# of Sales')
+plt.ylabel('Cut Type')
+plt.grid('both')
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T16:33:02.939732500Z', start_time: '2023-10-26T16:33:02.748882100Z'}
+sns.countplot(data=diamonds, y='clarity', 
+              order = diamonds['clarity'].value_counts(ascending=True).index,
+              palette=sns.color_palette('flare', 10))
+plt.xlabel('# of Sales')
+plt.ylabel('Clarity Type')
+plt.title('Diamonds Dataset - Sales by Clarity Type')
+plt.grid('both')
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T16:32:46.643921Z', start_time: '2023-10-26T16:32:46.499217700Z'}
+sns.countplot(data=diamonds, 
+              x = 'color', 
+              order = diamonds['color'].value_counts(ascending=False).index,
+              palette=sns.color_palette('flare', 10))
+plt.ylabel('# of Sales')
+plt.xlabel('Color')
+plt.grid('both')
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T17:33:51.778661100Z', start_time: '2023-10-26T17:33:51.124834300Z'}
+sns.kdeplot(diamonds, x='price', hue='color', common_norm=False)
+plt.show()
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T17:40:50.068908900Z', start_time: '2023-10-26T17:40:50.050214200Z'}
+diamonds['clarity'].value_counts(ascending=False)
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T17:40:55.190610Z', start_time: '2023-10-26T17:40:55.132117500Z'}
+diamonds['color'].value_counts(ascending=False)
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T17:40:58.033141600Z', start_time: '2023-10-26T17:40:57.971438500Z'}
+diamonds['cut'].value_counts(ascending=False)
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T17:48:46.755062600Z', start_time: '2023-10-26T17:48:46.114742400Z'}
+# Analyzing distribution of numeric features with histogram plot
+sns.set_theme(style="whitegrid")
+diamonds.hist(bins=50, figsize=(12, 8))
+plt.show()
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T17:50:05.717996200Z', start_time: '2023-10-26T17:50:05.700818800Z'}
+corr_matrix = diamonds.select_dtypes(np.number).corr()
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T17:50:37.123589900Z', start_time: '2023-10-26T17:50:37.107829500Z'}
+corr_matrix['price'].sort_values(ascending=False)
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T18:47:58.235267500Z', start_time: '2023-10-26T18:47:52.530949500Z'}
+from pandas.plotting import scatter_matrix
+scatter_matrix(diamonds[['price', 'carat', 'x', 'y', 'z', 'table', 'depth']], figsize=(15, 10))
+plt.show()
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T19:17:11.185590800Z', start_time: '2023-10-26T19:13:11.337356900Z'}
+from prettytable import PrettyTable
+def pretty_printing_function(correlation_name, row_values, column_names):
+    summary_table = PrettyTable()
+    summary_table.title = f"{correlation_name} Correlation Matrix for the tute1 dataset"
+    column_names = [f'Feature({chr(0x2193)})/({chr(0x2192)})'] + column_names
+    summary_table.field_names = column_names
+    for i in range(len(row_values)):
+        row_index = column_names[i+1]
+        row_values[i] = [row_index] + row_values[i]
+        summary_table.add_row(row_values[i])
+    print(summary_table)
+
+
+def calc_pearson_corr(x, y, N):
+    numerator_sum = 0.0; denomnator1_sum = 0.0; denomnator2_sum = 0.0
+    x_mean = np.mean(x)
+    y_mean = np.mean(y)
+    for i in range(N):
+        x_diff = x[i] - x_mean
+        y_diff = y[i] - y_mean
+        numerator_sum += (x_diff * y_diff)
+        denomnator1_sum += np.power(x_diff, 2)
+        denomnator2_sum += np.power(y_diff, 2)
+    pearson_corrcoef = numerator_sum/(np.sqrt(denomnator1_sum)*np.sqrt(denomnator2_sum))
+    return round(pearson_corrcoef, 2)
+
+
+def calc_partial_corr(x, y, z):
+    r_xy = calc_pearson_corr(x, y, len(diamonds))
+    r_xz = calc_pearson_corr(x, z, len(diamonds))
+    r_yz = calc_pearson_corr(y, z, len(diamonds))
+    partial_corr = (r_xy - (r_xz*r_yz)) / (np.sqrt(1 - r_xz**2) * np.sqrt(1 - r_yz**2))
+    return round(partial_corr, 2)
+
+
+diamonds_numeric = diamonds.select_dtypes(np.number)
+def calc_partial_correlation():
+    summary_df = pd.DataFrame(columns = diamonds_numeric.columns, index = diamonds_numeric.columns)
+    for col1 in diamonds_numeric.columns:
+        for col2 in diamonds_numeric.columns:
+            if col1 == col2:
+                summary_df.loc[col1, col2] = 1.0
+            else:
+                other_columns = list(set(diamonds_numeric.columns) - set([col1, col2]))
+                for col3 in other_columns:
+                    summary_df.loc[col1, col2] = calc_partial_corr(diamonds_numeric[col1], diamonds_numeric[col2], diamonds_numeric[col3])
+    pretty_printing_function("Partial", summary_df.values.tolist(), column_names=list(summary_df.columns))
+    return summary_df
+
+calc_partial_correlation()
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T19:56:20.076654700Z', start_time: '2023-10-26T19:56:19.898683400Z'}
+diamonds.plot(kind="scatter", x="price", y="carat",
+             alpha=0.07, grid=True)
+plt.show()
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T19:57:20.239470600Z', start_time: '2023-10-26T19:57:20.176523500Z'}
+diamonds.shape
+diamonds.head(10)
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T20:34:28.761383700Z', start_time: '2023-10-26T20:34:28.729891800Z'}
+# One-hot encode the categorical variabled before feeding into linear model
+from sklearn.preprocessing import OneHotEncoder
+
+diamonds_cut = diamonds[['cut']]
+
+enc = OneHotEncoder(handle_unknown='ignore')
+diamonds_cuts_onehot = enc.fit_transform(diamonds_cut)
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T20:35:01.475584200Z', start_time: '2023-10-26T20:35:01.455234Z'}
+enc.categories_
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T20:35:07.057193100Z', start_time: '2023-10-26T20:35:07.041259600Z'}
+enc.get_feature_names_out()
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T20:35:49.300424200Z', start_time: '2023-10-26T20:35:49.253212300Z'}
+diamonds_cuts_onehot.toarray()
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T20:58:46.490822300Z', start_time: '2023-10-26T20:58:46.455046Z'}
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import make_pipeline
+from sklearn.impute import SimpleImputer
+
+categorical_features = ['cut', 'color', 'clarity']
+numeric_features = ['x', 'y', 'z', 'carat', 'depth', 'table']
+
+numeric_transformer = make_pipeline(SimpleImputer(strategy='median'), StandardScaler())
+
+preprocessor = ColumnTransformer(
+    [
+        ('num', numeric_transformer, numeric_features),
+        ('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), categorical_features),
+    ],
+    verbose_feature_names_out=False
+)
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T20:58:54.129989Z', start_time: '2023-10-26T20:58:54.114063100Z'}
+diamonds_features, diamonds_price = diamonds.loc[:, diamonds.columns != 'price'], diamonds['price']
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T20:58:55.560701100Z', start_time: '2023-10-26T20:58:55.558250500Z'}
+diamonds_features.shape
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T20:58:59.711588800Z', start_time: '2023-10-26T20:58:59.679956Z'}
+diamonds_price.shape
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-26T20:59:01.879385400Z', start_time: '2023-10-26T20:59:01.863274500Z'}
+diamonds_features.head()
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-27T04:12:35.470919700Z', start_time: '2023-10-27T04:12:35.391970900Z'}
+from sklearn.model_selection import train_test_split
+diamonds_features_train, diamonds_features_test, diamonds_price_train, diamonds_price_test = train_test_split(diamonds_features, diamonds_price, test_size=0.25)
+
+#print(diamonds_features_train.head(), diamonds_price_train.head())
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-27T04:37:18.578767700Z', start_time: '2023-10-27T04:37:18.424856600Z'}
+from sklearn.linear_model import LinearRegression
+
+lin_reg = make_pipeline(preprocessor, LinearRegression())
+lin_reg.fit(diamonds_features_train, diamonds_price_train)
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-27T04:38:05.886747500Z', start_time: '2023-10-27T04:38:05.823902900Z'}
+lin_reg[:-1].get_feature_names_out()
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-27T04:38:49.389348800Z', start_time: '2023-10-27T04:38:49.006543500Z'}
+lin_reg_input_features = lin_reg[:-1].get_feature_names_out()
+pd.Series(lin_reg[-1].coef_.ravel(), index=lin_reg_input_features).plot.bar()
+plt.tight_layout()
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-27T04:39:03.362019500Z', start_time: '2023-10-27T04:39:03.317344800Z'}
+diamonds_price_predictor = lin_reg.predict(diamonds_features_test)
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-27T04:39:05.682923900Z', start_time: '2023-10-27T04:39:05.650950500Z'}
+lin_reg[-1].coef_
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-27T04:39:10.101743800Z', start_time: '2023-10-27T04:39:10.073130800Z'}
+from sklearn.metrics import mean_squared_error, r2_score
+
+print("Mean Squared Error: %.2f" % mean_squared_error(diamonds_price_test, diamonds_price_predictor))
+print("Coefficient of Determination: %.2f" % r2_score(diamonds_price_test, diamonds_price_predictor))
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-27T04:42:29.514113800Z', start_time: '2023-10-27T04:42:27.577839400Z'}
+from sklearn.linear_model import SGDRegressor
+
+sgd_reg = make_pipeline(preprocessor, SGDRegressor(max_iter=1000, tol=1e-5, penalty=None, eta0=0.01, n_iter_no_change=100, random_state=42))
+sgd_reg.fit(diamonds_features_train, diamonds_price_train)
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-27T04:46:31.440390200Z', start_time: '2023-10-27T04:46:31.392768Z'}
+price_predictor_sgd = sgd_reg.predict(diamonds_features_test)
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-27T04:47:14.753844800Z', start_time: '2023-10-27T04:47:14.674575800Z'}
+print("Mean Squared Error: %.2f" % mean_squared_error(diamonds_price_test, price_predictor_sgd))
+print("Coefficient of Determination: %.2f" % r2_score(diamonds_price_test, price_predictor_sgd))
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-27T04:52:16.717464500Z', start_time: '2023-10-27T04:51:28.881451600Z'}
+from sklearn.ensemble import RandomForestRegressor
+
+rfr_reg = make_pipeline(preprocessor, RandomForestRegressor())
+rfr_reg.fit(diamonds_features_train, diamonds_price_train)
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-27T04:52:22.477783800Z', start_time: '2023-10-27T04:52:22.047258400Z'}
+price_predictor_rfr = rfr_reg.predict(diamonds_features_test)
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-10-27T04:52:38.698920Z', start_time: '2023-10-27T04:52:38.651693800Z'}
+print("Mean Squared Error: %.2f" % mean_squared_error(diamonds_price_test, price_predictor_rfr))
+print("Coefficient of Determination: %.2f" % r2_score(diamonds_price_test, price_predictor_rfr))
+```
+
+
