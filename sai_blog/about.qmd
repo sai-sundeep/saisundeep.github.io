@@ -2,7 +2,7 @@
 title: "Sai Sundeep Rayidi"
 image: profile.jpg
 about:
-  template: jolla
+  template: solana
   links:
     - icon: linkedin
       text: LinkedIn
@@ -13,4 +13,18 @@ about:
 
 ---
 
-Hi, I am Sai, I am a Computer Science graduate student at Virginia Tech. My interests include Data Analytics, Visualization and Machine Learning. 
+Hi, I am Sai, a Computer Science graduate student at Virginia Tech. I blog about Data Analytics, Visualization and Machine Learning. When not innovating on these topics, I enjoy reading, prepping for a half-marathon, and playing cricket.
+
+
+## Education
+
+Virginia Tech, Falls Church | D.C. Area, VA
+MEng in Computer Science and Application | August 2023 - Present
+
+Jawaharlal Nehru Technological University | Hyderabad, India
+Bachelors in Computer Science and Engineering | August 2015 - May 2019
+
+## Experience
+
+Verizon AI & DATA | Data Engineer | October 2021 - June 2023
+Verizon Global Network & Technology | Systems Engineer | August 2019 - September 2021
