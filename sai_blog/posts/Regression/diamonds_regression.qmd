@@ -19,7 +19,7 @@ sns.set_theme(style="darkgrid")
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T15:52:31.912697Z', start_time: '2023-10-26T15:52:31.840067100Z'}
 diamonds = sns.load_dataset('diamonds')
 print(diamonds.shape)
@@ -28,7 +28,7 @@ print(diamonds.head(10))
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T16:35:00.031495600Z', start_time: '2023-10-26T16:34:59.143356600Z'}
 sns.histplot(data=diamonds, x='price', kde=True)
 plt.title('Diamonds Dataset - Price Distribution')
@@ -39,7 +39,7 @@ plt.show()
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T16:33:12.952332800Z', start_time: '2023-10-26T16:33:12.777618Z'}
 sns.countplot(data=diamonds, y='cut', order=diamonds['cut'].value_counts().index,
               palette=sns.color_palette('flare', 10))
@@ -52,7 +52,7 @@ plt.show()
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T16:33:02.939732500Z', start_time: '2023-10-26T16:33:02.748882100Z'}
 sns.countplot(data=diamonds, y='clarity', 
               order = diamonds['clarity'].value_counts(ascending=True).index,
@@ -66,7 +66,7 @@ plt.show()
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T16:32:46.643921Z', start_time: '2023-10-26T16:32:46.499217700Z'}
 sns.countplot(data=diamonds, 
               x = 'color', 
@@ -80,32 +80,32 @@ plt.show()
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T17:33:51.778661100Z', start_time: '2023-10-26T17:33:51.124834300Z'}
 sns.kdeplot(diamonds, x='price', hue='color', common_norm=False)
 plt.show()
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T17:40:50.068908900Z', start_time: '2023-10-26T17:40:50.050214200Z'}
 diamonds['clarity'].value_counts(ascending=False)
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T17:40:55.190610Z', start_time: '2023-10-26T17:40:55.132117500Z'}
 diamonds['color'].value_counts(ascending=False)
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T17:40:58.033141600Z', start_time: '2023-10-26T17:40:57.971438500Z'}
 diamonds['cut'].value_counts(ascending=False)
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T17:48:46.755062600Z', start_time: '2023-10-26T17:48:46.114742400Z'}
 # Analyzing distribution of numeric features with histogram plot
 sns.set_theme(style="whitegrid")
@@ -114,19 +114,19 @@ plt.show()
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T17:50:05.717996200Z', start_time: '2023-10-26T17:50:05.700818800Z'}
 corr_matrix = diamonds.select_dtypes(np.number).corr()
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T17:50:37.123589900Z', start_time: '2023-10-26T17:50:37.107829500Z'}
 corr_matrix['price'].sort_values(ascending=False)
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T18:47:58.235267500Z', start_time: '2023-10-26T18:47:52.530949500Z'}
 from pandas.plotting import scatter_matrix
 scatter_matrix(diamonds[['price', 'carat', 'x', 'y', 'z', 'table', 'depth']], figsize=(15, 10))
@@ -134,7 +134,7 @@ plt.show()
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T19:17:11.185590800Z', start_time: '2023-10-26T19:13:11.337356900Z'}
 from prettytable import PrettyTable
 def pretty_printing_function(correlation_name, row_values, column_names):
@@ -189,7 +189,7 @@ calc_partial_correlation()
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T19:56:20.076654700Z', start_time: '2023-10-26T19:56:19.898683400Z'}
 diamonds.plot(kind="scatter", x="price", y="carat",
              alpha=0.07, grid=True)
@@ -197,14 +197,14 @@ plt.show()
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T19:57:20.239470600Z', start_time: '2023-10-26T19:57:20.176523500Z'}
 diamonds.shape
 diamonds.head(10)
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T20:34:28.761383700Z', start_time: '2023-10-26T20:34:28.729891800Z'}
 # One-hot encode the categorical variabled before feeding into linear model
 from sklearn.preprocessing import OneHotEncoder
@@ -216,25 +216,25 @@ diamonds_cuts_onehot = enc.fit_transform(diamonds_cut)
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T20:35:01.475584200Z', start_time: '2023-10-26T20:35:01.455234Z'}
 enc.categories_
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T20:35:07.057193100Z', start_time: '2023-10-26T20:35:07.041259600Z'}
 enc.get_feature_names_out()
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T20:35:49.300424200Z', start_time: '2023-10-26T20:35:49.253212300Z'}
 diamonds_cuts_onehot.toarray()
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T20:58:46.490822300Z', start_time: '2023-10-26T20:58:46.455046Z'}
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import make_pipeline
@@ -255,31 +255,31 @@ preprocessor = ColumnTransformer(
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T20:58:54.129989Z', start_time: '2023-10-26T20:58:54.114063100Z'}
 diamonds_features, diamonds_price = diamonds.loc[:, diamonds.columns != 'price'], diamonds['price']
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T20:58:55.560701100Z', start_time: '2023-10-26T20:58:55.558250500Z'}
 diamonds_features.shape
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T20:58:59.711588800Z', start_time: '2023-10-26T20:58:59.679956Z'}
 diamonds_price.shape
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-26T20:59:01.879385400Z', start_time: '2023-10-26T20:59:01.863274500Z'}
 diamonds_features.head()
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-27T04:12:35.470919700Z', start_time: '2023-10-27T04:12:35.391970900Z'}
 from sklearn.model_selection import train_test_split
 diamonds_features_train, diamonds_features_test, diamonds_price_train, diamonds_price_test = train_test_split(diamonds_features, diamonds_price, test_size=0.25)
@@ -288,7 +288,7 @@ diamonds_features_train, diamonds_features_test, diamonds_price_train, diamonds_
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-27T04:37:18.578767700Z', start_time: '2023-10-27T04:37:18.424856600Z'}
 from sklearn.linear_model import LinearRegression
 
@@ -297,13 +297,13 @@ lin_reg.fit(diamonds_features_train, diamonds_price_train)
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-27T04:38:05.886747500Z', start_time: '2023-10-27T04:38:05.823902900Z'}
 lin_reg[:-1].get_feature_names_out()
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-27T04:38:49.389348800Z', start_time: '2023-10-27T04:38:49.006543500Z'}
 lin_reg_input_features = lin_reg[:-1].get_feature_names_out()
 pd.Series(lin_reg[-1].coef_.ravel(), index=lin_reg_input_features).plot.bar()
@@ -311,19 +311,19 @@ plt.tight_layout()
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-27T04:39:03.362019500Z', start_time: '2023-10-27T04:39:03.317344800Z'}
 diamonds_price_predictor = lin_reg.predict(diamonds_features_test)
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-27T04:39:05.682923900Z', start_time: '2023-10-27T04:39:05.650950500Z'}
 lin_reg[-1].coef_
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-27T04:39:10.101743800Z', start_time: '2023-10-27T04:39:10.073130800Z'}
 from sklearn.metrics import mean_squared_error, r2_score
 
@@ -332,7 +332,7 @@ print("Coefficient of Determination: %.2f" % r2_score(diamonds_price_test, diamo
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-27T04:42:29.514113800Z', start_time: '2023-10-27T04:42:27.577839400Z'}
 from sklearn.linear_model import SGDRegressor
 
@@ -341,20 +341,20 @@ sgd_reg.fit(diamonds_features_train, diamonds_price_train)
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-27T04:46:31.440390200Z', start_time: '2023-10-27T04:46:31.392768Z'}
 price_predictor_sgd = sgd_reg.predict(diamonds_features_test)
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-27T04:47:14.753844800Z', start_time: '2023-10-27T04:47:14.674575800Z'}
 print("Mean Squared Error: %.2f" % mean_squared_error(diamonds_price_test, price_predictor_sgd))
 print("Coefficient of Determination: %.2f" % r2_score(diamonds_price_test, price_predictor_sgd))
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-27T04:52:16.717464500Z', start_time: '2023-10-27T04:51:28.881451600Z'}
 from sklearn.ensemble import RandomForestRegressor
 
@@ -363,13 +363,13 @@ rfr_reg.fit(diamonds_features_train, diamonds_price_train)
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-27T04:52:22.477783800Z', start_time: '2023-10-27T04:52:22.047258400Z'}
 price_predictor_rfr = rfr_reg.predict(diamonds_features_test)
 ```
 
 ```{python}
-#| collapsed: false
+#| collapsed: true
 #| ExecuteTime: {end_time: '2023-10-27T04:52:38.698920Z', start_time: '2023-10-27T04:52:38.651693800Z'}
 print("Mean Squared Error: %.2f" % mean_squared_error(diamonds_price_test, price_predictor_rfr))
 print("Coefficient of Determination: %.2f" % r2_score(diamonds_price_test, price_predictor_rfr))
