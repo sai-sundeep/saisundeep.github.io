@@ -4,6 +4,10 @@ author: "Sai Sundeep Rayidi"
 date: "2023-10-13"
 categories: [regression, news, code, analysis, polynomial regression]
 image: "regression.png"
+format:
+  html:
+    code-fold: true
+    code-summary: "Show the code"
 ---
 
 This is a post on regression analysis on diamonds dataset.
