@@ -6,8 +6,6 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Sai Sundeep Rayidi">
-<meta name="dcterms.date" content="2023-11-18">
 
 <title>Sai’s ML blog - Multiclass Classification on Fashion MNIST Dataset</title>
 <style>
@@ -104,10 +102,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="../../styles.css">
 <meta property="og:title" content="Sai’s ML blog - Multiclass Classification on Fashion MNIST Dataset">
 <meta property="og:description" content="">
-<meta property="og:image" content="https://sai-sundeep.github.io/saisundeep.github.io/posts/Classification/classification.png">
+<meta property="og:image" content="https://sai-sundeep.github.io/saisundeep.github.io/posts/Classification/fashion_mnist_classification_files/figure-html/cell-6-output-1.png">
 <meta property="og:site-name" content="Sai's ML blog">
-<meta property="og:image:height" content="327">
-<meta property="og:image:width" content="557">
+<meta property="og:image:height" content="1211">
+<meta property="og:image:width" content="1211">
 </head>
 
 <body class="nav-fixed fullcontent">
@@ -165,37 +163,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">Multiclass Classification on Fashion MNIST Dataset</h1>
-                                <div class="quarto-categories">
-                <div class="quarto-category">classification</div>
-                <div class="quarto-category">precision</div>
-                <div class="quarto-category">recall</div>
-                <div class="quarto-category">f1-score</div>
-                <div class="quarto-category">code</div>
-                <div class="quarto-category">PCA analysis</div>
-                <div class="quarto-category">Confusion Matrix</div>
-                <div class="quarto-category">RandomizedSearch</div>
-                <div class="quarto-category">visualization</div>
-                <div class="quarto-category">Multi-Class</div>
-              </div>
-                  </div>
+                      </div>
   </div>
     
   
   <div class="quarto-title-meta">
 
-      <div>
-      <div class="quarto-title-meta-heading">Author</div>
-      <div class="quarto-title-meta-contents">
-               <p>Sai Sundeep Rayidi </p>
-            </div>
-    </div>
       
-      <div>
-      <div class="quarto-title-meta-heading">Published</div>
-      <div class="quarto-title-meta-contents">
-        <p class="date">November 18, 2023</p>
-      </div>
-    </div>
     
       
     </div>
@@ -226,8 +200,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-18T03:34:03.831388700Z&quot;,&quot;start_time&quot;:&quot;2023-11-18T03:34:01.930845300Z&quot;}" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the train and test datasets</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>fmnist_train_df <span class="op">=</span> pd.read_csv(<span class="st">"fashion_mnist_train.csv"</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>fmnist_test_df <span class="op">=</span> pd.read_csv(<span class="st">"fashion_mnist_test.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>fmnist_train_df <span class="op">=</span> pd.read_csv(<span class="st">"data/fashion_mnist_train.csv"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>fmnist_test_df <span class="op">=</span> pd.read_csv(<span class="st">"data/fashion_mnist_test.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-18T03:34:03.837791800Z&quot;,&quot;start_time&quot;:&quot;2023-11-18T03:34:03.835239200Z&quot;}" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Train Set Dimensions - </span><span class="sc">{</span>fmnist_train_df<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">'</span>)</span>
@@ -535,7 +509,7 @@ Test Set Dimensions - (10000, 785)</code></pre>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">False</span>)</span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-6-output-1.png" width="1163" height="1159"></p>
+<p><img src="fashion_mnist_classification_files/figure-html/cell-6-output-1.png" class="img-fluid"></p>
 </div>
 </div>
 <p>We can see from the above plot different kinds of fashion products in the dataset. An obvious difficulty our multiclass classification algorith may face is the close resemblance of three different classes - class 0, class 2, and class 6. Fashion MNIST labels these classes as T-shirt/Top, Pullover, and Shirt respectively. To make target classes clear for us going forward, let us write a helper function that maps, the respective class number to its corresponding label.</p>
@@ -609,7 +583,7 @@ Name: label, dtype: object</code></pre>
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span>
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-10-output-1.png" width="582" height="407"></p>
+<p><img src="fashion_mnist_classification_files/figure-html/cell-10-output-1.png" class="img-fluid"></p>
 </div>
 </div>
 </section>
@@ -658,7 +632,7 @@ Name: label, dtype: object</code></pre>
 <span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>plt.grid(which<span class="op">=</span><span class="st">'major'</span>, linestyle<span class="op">=</span><span class="st">'-'</span>)</span>
 <span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-12-output-1.png" width="684" height="523"></p>
+<p><img src="fashion_mnist_classification_files/figure-html/cell-12-output-1.png" class="img-fluid"></p>
 </div>
 </div>
 </section>
@@ -763,9 +737,7 @@ Name: label, dtype: object</code></pre>
 
     accuracy                           0.87     10000
    macro avg       0.86      0.87      0.86     10000
-weighted avg       0.86      0.87      0.86     10000
-
-</code></pre>
+weighted avg       0.86      0.87      0.86     10000</code></pre>
 </div>
 </div>
 <p>So how do we read this classification report? Let us first define each of the metrics.</p>
@@ -783,7 +755,7 @@ weighted avg       0.86      0.87      0.86     10000
 <p><strong>F1 Score</strong> <span class="math display">\[ {\displaystyle \mathrm {F} _{1}=2\times {\frac {\mathrm {PPV} \times \mathrm {TPR} }{\mathrm {PPV} +\mathrm {TPR} }}={\frac {2\mathrm {TP} }{2\mathrm {TP} +\mathrm {FP} +\mathrm {FN} }}} \]</span></p>
 <p><strong>Accuracy (ACC)</strong> <span class="math display">\[ {\displaystyle \mathrm {ACC} ={\frac {\mathrm {TP} +\mathrm {TN} }{\mathrm {P} +\mathrm {N} }}={\frac {\mathrm {TP} +\mathrm {TN} }{\mathrm {TP} +\mathrm {TN} +\mathrm {FP} +\mathrm {FN} }}} \]</span></p>
 <p>Anathor important tool to evaluate the classifier is the <strong>Confusion Matrix</strong>, in the multi-class classification context, it gives the actual predictions in horizontal rows and predicted classes in vertical columns. We can use the ConfusionMatrixDisplay from scikit learn’s metrics module to plot the confusion matrix for the classifier.</p>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-18T03:57:37.274586600Z&quot;,&quot;start_time&quot;:&quot;2023-11-18T03:57:37.080311300Z&quot;}" data-execution_count="17">
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-18T03:57:37.274586600Z&quot;,&quot;start_time&quot;:&quot;2023-11-18T03:57:37.080311300Z&quot;}" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> ConfusionMatrixDisplay</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>disp <span class="op">=</span> ConfusionMatrixDisplay.from_predictions(y_test, y_pred)</span>
@@ -806,11 +778,11 @@ weighted avg       0.86      0.87      0.86     10000
  [  1   1   3  20   4   0   4   0   3 964]]</code></pre>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-18-output-2.png" width="567" height="533"></p>
+<p><img src="fashion_mnist_classification_files/figure-html/cell-18-output-2.png" class="img-fluid"></p>
 </div>
 </div>
 <p>We can normalize the confusion matrix by dividing each value by the total number of images in the corresponding (true) class (i.e., divide by the row’s sum). This helps us to see where the model has misclassfied the images of a given class as belonging to different class.</p>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-18T03:59:13.797141700Z&quot;,&quot;start_time&quot;:&quot;2023-11-18T03:59:13.480594700Z&quot;}" data-execution_count="18">
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-18T03:59:13.797141700Z&quot;,&quot;start_time&quot;:&quot;2023-11-18T03:59:13.480594700Z&quot;}" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the normalized confused matrix.</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>ConfusionMatrixDisplay.from_predictions(y_test, y_pred, normalize<span class="op">=</span><span class="st">'true'</span>, values_format<span class="op">=</span><span class="st">".0%"</span>)</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>plt.grid()</span>
@@ -818,7 +790,7 @@ weighted avg       0.86      0.87      0.86     10000
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>plt.xticks(rotation<span class="op">=</span><span class="dv">60</span>)</span>
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-19-output-1.png" width="563" height="505"></p>
+<p><img src="fashion_mnist_classification_files/figure-html/cell-19-output-1.png" class="img-fluid"></p>
 </div>
 </div>
 </section>
