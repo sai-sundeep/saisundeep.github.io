@@ -5,9 +5,10 @@
       "/posts/welcome/index.html",
       "/posts/Probability Theory and Random Variables/index.html",
       "/posts/Clustering/index.html",
-      "/posts/Classification/index.html",
       "/posts/Regression/index.html",
       "/posts/Anomaly Detection/index.html",
+      "/posts/Classification/index.html",
+      "/posts/Classification/fashion_mnist_classification.html",
       "/posts/Regression/diamonds_regression.html"
     ]
   }
