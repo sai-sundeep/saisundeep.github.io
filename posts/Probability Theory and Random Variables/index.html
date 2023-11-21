@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Sai Sundeep Rayidi">
-<meta name="dcterms.date" content="2023-10-03">
+<meta name="dcterms.date" content="2023-11-21">
 
-<title>Sai’s ML blog - Probability Theory and Random Variables</title>
+<title>Sai’s ML blog - Probability Theory - Gaussian Distribution, Normality Tests, and Z-Scores</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -60,13 +94,20 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../../styles.css">
-<meta property="og:title" content="Sai’s ML blog - Probability Theory and Random Variables">
+<meta property="og:title" content="Sai’s ML blog - Probability Theory - Gaussian Distribution, Normality Tests, and Z-Scores">
 <meta property="og:description" content="">
-<meta property="og:image" content="https://sai-sundeep.github.io/saisundeep.github.io/posts/Probability Theory and Random Variables/probability.jpg">
+<meta property="og:image" content="https://sai-sundeep.github.io/saisundeep.github.io/posts/Probability Theory and Random Variables/Standard_deviation_diagram_micro.png">
 <meta property="og:site-name" content="Sai's ML blog">
+<meta property="og:image:height" content="200">
+<meta property="og:image:width" content="400">
 </head>
 
 <body class="nav-fixed fullcontent">
@@ -123,12 +164,12 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Probability Theory and Random Variables</h1>
+      <h1 class="title">Probability Theory - Gaussian Distribution, Normality Tests, and Z-Scores</h1>
                                 <div class="quarto-categories">
-                <div class="quarto-category">probability theory</div>
-                <div class="quarto-category">code</div>
-                <div class="quarto-category">analysis</div>
-                <div class="quarto-category">random variables</div>
+                <div class="quarto-category">Probability Theory</div>
+                <div class="quarto-category">Gaussian Distribution</div>
+                <div class="quarto-category">Visualization</div>
+                <div class="quarto-category">Normality Test</div>
               </div>
                   </div>
   </div>
@@ -146,7 +187,7 @@ ul.task-list li input[type="checkbox"] {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">October 3, 2023</p>
+        <p class="date">November 21, 2023</p>
       </div>
     </div>
     
@@ -164,9 +205,377 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<p>This is a post with executable code.</p>
+<p>In this blogpost, we will be discussing an important topic in statistics and machine learning - the <em>Gaussian Distribution</em>, also called the <em>Normal Distribution</em>. It is used to model many natural phenomena in the world, from people’s heights to size of snowflakes, errors in measurements, and other financial and forecasting data. We will talk about why gaussian distribution is important in machine learning and how many ML algorithms assume that underlying data is normally distributed. We will explore some graphical and numerical methods to perform normality tests on data. Finally, we will try to transform the data to standard normal distribution by calculating <em>z-scores</em>. At a high level, we will explore -</p>
+<ol type="1">
+<li>Normal Distribution and Machine Learning</li>
+<li>Normality Tests
+<ul>
+<li>Graphical Methods</li>
+<li>Statistical Normality Tests</li>
+</ul></li>
+<li>Transformation to Standard Normal Distribution (Scaling): Z-Scores</li>
+</ol>
+<p>We will be working with the <strong>iris</strong> dataset throughout this blogpost.</p>
+<section id="normal-distribution-and-machine-learning" class="level2">
+<h2 class="anchored" data-anchor-id="normal-distribution-and-machine-learning">1. Normal Distribution and Machine Learning</h2>
+<p>A normal distribution is a probability distribution that is symmetric about the mean, showing that data near the mean are more frequent in occurrence than data far from the mean. It is also known as the Gaussian distribution. The standard normal distribution is a normal distribution with zero mean and unit variance. The normal distribution has several key features and properties that define it. First, its mean (average), median (midpoint), and mode (most frequent observation) are all equal to one another. Moreover, these values all represent the peak, or highest point, of the distribution. The distribution then falls symmetrically around the mean, the width of which is defined by the standard deviation.</p>
+<p>All normal distributions can be described by just two parameters: the mean and the standard deviation. The Empirical Rule states that for all normal distributions, 68.2% of the observations will appear within plus or minus one standard deviation of the mean; 95.4% of the observations will fall within +/- two standard deviations; and 99.7% within +/- three standard deviations. This fact is sometimes referred to as the “empirical rule,” a heuristic that describes where most of the data in a normal distribution will appear. This means that data falling outside of three standard deviations (“3-sigma”) would signify rare occurrences</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Standard_deviation_diagram_micro.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Standard Normal Distribution</figcaption>
+</figure>
+</div>
+<p>Machine learning models can be classified into two categories: parametric and non-parametric methods.</p>
+<p>Parametric methods are those that require the specification of some parameters before they can be used to make predictions. These models make assumptions about the distribution of the data, and the parameters are estimated from the training data. They are generally simpler and faster to train and do not require huge amounts of data contrary to non-parametric methods. Non-parametric models do not make any assumptions about the distribution of the data and instead rely on the data itself to determine the model structure, they may be slower to train and require more data to achieve good performance.</p>
+<p>It is usually good practice to first try parametric models like Linear Regression, Logistic Regression, Linear Discriminant Analysis (LDA), and Gaussian Naive Bias before exploring other non-parametric methods and advanced models. Furthermore, converting the data into a normal distribution allows for fair comparisons of features with different distributions and scales and improve the accuracy of predictions.</p>
+<p>Let us start importing some packages and exploring the diamonds dataset and its features.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-21T21:26:10.370907400Z&quot;,&quot;start_time&quot;:&quot;2023-11-21T21:26:10.320453200Z&quot;}" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>warnings.simplefilter(<span class="st">'ignore'</span>, <span class="pp">UserWarning</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>iris <span class="op">=</span> sns.load_dataset(<span class="st">'iris'</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>iris.head(<span class="dv">10</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># iris.columns #'sepal_length', 'sepal_width', 'petal_length', 'petal_width','species'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
 
 
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">sepal_length</th>
+<th data-quarto-table-cell-role="th">sepal_width</th>
+<th data-quarto-table-cell-role="th">petal_length</th>
+<th data-quarto-table-cell-role="th">petal_width</th>
+<th data-quarto-table-cell-role="th">species</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>5.1</td>
+<td>3.5</td>
+<td>1.4</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>4.9</td>
+<td>3.0</td>
+<td>1.4</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>4.7</td>
+<td>3.2</td>
+<td>1.3</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4.6</td>
+<td>3.1</td>
+<td>1.5</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5.0</td>
+<td>3.6</td>
+<td>1.4</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>5.4</td>
+<td>3.9</td>
+<td>1.7</td>
+<td>0.4</td>
+<td>setosa</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>4.6</td>
+<td>3.4</td>
+<td>1.4</td>
+<td>0.3</td>
+<td>setosa</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>5.0</td>
+<td>3.4</td>
+<td>1.5</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>4.4</td>
+<td>2.9</td>
+<td>1.4</td>
+<td>0.2</td>
+<td>setosa</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>4.9</td>
+<td>3.1</td>
+<td>1.5</td>
+<td>0.1</td>
+<td>setosa</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-21T21:26:10.496740Z&quot;,&quot;start_time&quot;:&quot;2023-11-21T21:26:10.336354Z&quot;}" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sns.histplot(iris, x<span class="op">=</span><span class="st">'sepal_length'</span>, kde<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Distribution of </span><span class="ch">\"</span><span class="st">sepal_length</span><span class="ch">\"</span><span class="st"> Feature"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-3-output-1.png" width="585" height="449"></p>
+</div>
+</div>
+<p>A variable that is normally distributed has a histogram (or “density function”) that is bell-shaped, with only one peak, and is symmetric around the mean. The sepal_length feature does seem to resember the bell-shaped curve and can be normally distributed, lets us explore the other numeric features as well.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-21T21:26:11.002772900Z&quot;,&quot;start_time&quot;:&quot;2023-11-21T21:26:10.476596200Z&quot;}" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> iris_histogram_plotter(df):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    features_list <span class="op">=</span> [<span class="st">'sepal_length'</span>, <span class="st">'sepal_width'</span>, <span class="st">'petal_length'</span>, <span class="st">'petal_width'</span>]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    counter <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    fig, axs <span class="op">=</span> plt.subplots(nrows<span class="op">=</span><span class="dv">2</span>, ncols<span class="op">=</span><span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">15</span>))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>):</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>):</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            sns.histplot(df, x<span class="op">=</span>features_list[counter], kde<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span>axs[i][j])</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>            axs[i][j].set_title(<span class="ss">f"Distribution of </span><span class="ch">\"</span><span class="sc">{</span>features_list[counter]<span class="sc">}</span><span class="ch">\"</span><span class="ss"> Feature"</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>            counter <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>iris_histogram_plotter(df<span class="op">=</span>iris)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-4-output-1.png" width="1261" height="1189"></p>
+</div>
+</div>
+<p>We can see that amongst the four sepal_length and sepal_width features seem normally distributed. However, we will need to use more rigid tests to assess the normality of these features.</p>
+</section>
+<section id="normality-tests" class="level2">
+<h2 class="anchored" data-anchor-id="normality-tests">2. Normality Tests</h2>
+<p>A normality test is used to determine whether sample data has been drawn from a normally distributed population (within some tolerance). We can use graphical/visual methods or normality tests to assess normality of the data.</p>
+<section id="graphical-methods" class="level3">
+<h3 class="anchored" data-anchor-id="graphical-methods">2.1 Graphical Methods</h3>
+<p>Although somewhat unreliable and does not always guarantee that the distribution is normal, visual inspection is a very helpful step in assessing normality. The frequency distributions (histogram) we plotted earlier are one of the visual techniques. Other methods like stem-and-leaf plot, boxplot, P-P (probability-probability) plot, and <strong>Q-Q plot (quantile-quantile plot)</strong> are used for checking normality visually. We already explored histogram plot, we will plot Q-Q plot to test normality of numerical features in iris dataset. If the data is normally distributed for a feature, the points will fall on the 45-degree reference line.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-21T21:26:11.314085Z&quot;,&quot;start_time&quot;:&quot;2023-11-21T21:26:10.987109700Z&quot;}" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.graphics.gofplots <span class="im">import</span> qqplot</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>features_list <span class="op">=</span> [<span class="st">'sepal_length'</span>, <span class="st">'sepal_width'</span>, <span class="st">'petal_length'</span>, <span class="st">'petal_width'</span>]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>ax1 <span class="op">=</span> fig.add_subplot(<span class="dv">221</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>qqplot(iris[<span class="st">'sepal_length'</span>], line<span class="op">=</span><span class="st">'s'</span>, ax<span class="op">=</span>ax1)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>ax1.set_title(<span class="st">"QQ-plot - Normality Test for </span><span class="ch">\"</span><span class="st">sepal_length</span><span class="ch">\"</span><span class="st"> feature"</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>ax1.grid()</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>ax2 <span class="op">=</span> fig.add_subplot(<span class="dv">222</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>qqplot(iris[<span class="st">'petal_length'</span>], line<span class="op">=</span><span class="st">'s'</span>, ax<span class="op">=</span>ax2)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>ax2.set_title(<span class="st">"QQ-plot - Normality Test for </span><span class="ch">\"</span><span class="st">petal_length</span><span class="ch">\"</span><span class="st"> feature"</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>ax2.grid()</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>ax1 <span class="op">=</span> fig.add_subplot(<span class="dv">223</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>qqplot(iris[<span class="st">'sepal_width'</span>], line<span class="op">=</span><span class="st">'s'</span>, ax<span class="op">=</span>ax1)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>ax1.set_title(<span class="st">"QQ-plot - Normality Test for </span><span class="ch">\"</span><span class="st">sepal_width</span><span class="ch">\"</span><span class="st"> feature"</span>)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>ax1.grid()</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>ax2 <span class="op">=</span> fig.add_subplot(<span class="dv">224</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>qqplot(iris[<span class="st">'petal_width'</span>], line<span class="op">=</span><span class="st">'s'</span>, ax<span class="op">=</span>ax2)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>ax2.set_title(<span class="st">"QQ-plot - Normality Test for </span><span class="ch">\"</span><span class="st">petal_width</span><span class="ch">\"</span><span class="st"> feature"</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>ax2.grid()</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-5-output-1.png" width="844" height="819"></p>
+</div>
+</div>
+<p>Once again, we can see sepal length and width closely follow the standardized line while the petal length and petal width do not fit properly against the reference normal distribution.</p>
+</section>
+<section id="statistical-normality-tests" class="level3">
+<h3 class="anchored" data-anchor-id="statistical-normality-tests">2.2 Statistical Normality Tests</h3>
+<p>The Statistical Normality Tests are supplementary to the graphical assessment of normality. Read <a href="https://en.wikipedia.org/wiki/Normality_test#Frequentist_tests">here</a> for a complete list of normality tests. The main tests for the assessment of normality are -</p>
+<p><strong><a href="https://en.wikipedia.org/wiki/D%27Agostino%27s_K-squared_test">Kolmogorov-Smirnov (K-S) test</a></strong> or KS test is a nonparametric test of equality of a continuous one-dimensional probability distributions. It can be used to compare a sample with a reference probability distribution (like the samples drawn from normal distribution) or to compare two samples. The Kolmogorov–Smirnov statistic quantifies a distance between the empirical distribution function of the sample and the cumulative distribution function of the reference normal distribution. The empirical distribution function <span class="math inline">\(F_n\)</span> for n independent and identically distributed ordered observations <span class="math inline">\(X_i\)</span> is defined as -</p>
+<p><span class="math display">\[ {\displaystyle F_{n}(x)={\frac {{\text{number of (elements in the sample}}\leq x)}{n}}={\frac {1}{n}}\sum _{i=1}^{n}1_{(-\infty ,x]}(X_{i}),} \]</span></p>
+<p>A limitation of the K-S test is its high sensitivity to extreme values.</p>
+<p><strong><a href="https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test">Shapiro-Wilk test</a></strong> is based on the correlation between the data and the corresponding normal scores and provides better power than the K-S test. The test works by ordering and standardizing the samples <span class="math inline">\(\mu=0\)</span> and <span class="math inline">\(\sigma=1\)</span>. The test statistic is given by the formula -</p>
+<p><span class="math display">\[ {\displaystyle W={\left(\sum _{i=1}^{n}a_{i}x_{(i)}\right)^{2} \over \sum _{i=1}^{n}(x_{i}-{\overline {x}})^{2}},} \]</span></p>
+<p>One disadvantage is the Shapiro–Wilk test is known not to work well in samples with many identical values.</p>
+<p><strong><a href="https://en.wikipedia.org/wiki/D%27Agostino%27s_K-squared_test">D’Agostino’s K-squared test</a></strong> is a statistical test that measures how well a given dataset fits a normal distribution. The test is based on the sample skewness and kurtosis, which are measures of the asymmetry and peakedness of the data, respectively. The test statistic is calculated as the sum of the squares of the standardized deviations of the sample skewness and kurtosis from their expected values under the assumption of normality. The test statistic is then compared to a chi-squared distribution with two degrees of freedom, and the p-value is calculated. If the p-value is less than the significance level, then the null hypothesis that the data is normally distributed is rejected. Otherwise, the null hypothesis is not rejected.</p>
+<p>D’Agostino’s K-squared test is generally preferred over Shapiro-Wilk when the sample size is large.</p>
+<p>Let us import these methods from scipy.stats module, to test the normality of our iris dataset features.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-21T21:26:11.330059300Z&quot;,&quot;start_time&quot;:&quot;2023-11-21T21:26:11.314085Z&quot;}" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> kstest, shapiro, normaltest</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">5805</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calc_ks_test_statistics(sample):</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    sample_mean <span class="op">=</span> np.mean(sample)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    sample_sd <span class="op">=</span> np.std(sample)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    reference_normal_dist <span class="op">=</span> np.random.normal(sample_mean, sample_sd, <span class="bu">len</span>(sample))</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    statistic, p_value <span class="op">=</span> kstest(sample, reference_normal_dist)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> statistic, p_value</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calc_shapiro_test_statistics(sample):</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        statistic, p_value <span class="op">=</span> shapiro(sample)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> statistic, p_value</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calc_dk2_test_statistics(sample):</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        statistic, p_value <span class="op">=</span> normaltest(sample)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> statistic, p_value</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> normality_test(df, feature_list, tolerance):</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> feature <span class="kw">in</span> feature_list:</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'='</span> <span class="op">*</span> <span class="dv">100</span>)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        ks_statistic, ks_pvalue <span class="op">=</span> calc_ks_test_statistics(df[feature])</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Kolmogorov–Smirnov test: The test statistic and p-value of </span><span class="sc">{</span>feature<span class="sc">}</span><span class="ss"> are </span><span class="sc">{</span>ks_statistic<span class="sc">:.3f}</span><span class="ss"> and </span><span class="sc">{</span>ks_pvalue<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> ks_pvalue <span class="op">&lt;</span> tolerance:</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"According to KS-Test the feature </span><span class="sc">{</span>feature<span class="sc">}</span><span class="ss"> is NOT NORMALLY DISTRIBUTED."</span>)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"According to KS-Test the feature </span><span class="sc">{</span>feature<span class="sc">}</span><span class="ss"> is NORMALLY DISTRIBUTED!"</span>)</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'='</span> <span class="op">*</span> <span class="dv">100</span>)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>()</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'='</span> <span class="op">*</span> <span class="dv">100</span>)</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>        shapiro_statistic, shapiro_pvalue <span class="op">=</span> calc_shapiro_test_statistics(df[feature])</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Shapiro-Wilk Test: The test statistic and p-value of </span><span class="sc">{</span>feature<span class="sc">}</span><span class="ss"> are </span><span class="sc">{</span>shapiro_statistic<span class="sc">:.3f}</span><span class="ss"> and </span><span class="sc">{</span>shapiro_pvalue<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> shapiro_pvalue <span class="op">&lt;</span> tolerance:</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"According to Shapiro-Wilk the feature </span><span class="sc">{</span>feature<span class="sc">}</span><span class="ss"> is NOT NORMALLY DISTRIBUTED."</span>)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"According to Shapiro-Wilk the feature </span><span class="sc">{</span>feature<span class="sc">}</span><span class="ss"> is NORMALLY DISTRIBUTED!"</span>)</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'='</span> <span class="op">*</span> <span class="dv">100</span>)</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>()</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'='</span> <span class="op">*</span> <span class="dv">100</span>)</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>        dk2_statistic, dk2_pvalue <span class="op">=</span> calc_dk2_test_statistics(df[feature])</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"D’Agostino-Pearson Test: The test statistic and p-value of </span><span class="sc">{</span>feature<span class="sc">}</span><span class="ss"> are </span><span class="sc">{</span>dk2_statistic<span class="sc">:.3f}</span><span class="ss"> and </span><span class="sc">{</span>dk2_pvalue<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> dk2_pvalue <span class="op">&lt;</span> tolerance:</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"According to D’Agostino-Pearson test the feature </span><span class="sc">{</span>feature<span class="sc">}</span><span class="ss"> is NOT NORMALLY DISTRIBUTED."</span>)</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"According to D’Agostino-Pearson test the feature </span><span class="sc">{</span>feature<span class="sc">}</span><span class="ss"> is NORMALLY DISTRIBUTED!"</span>)</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'='</span> <span class="op">*</span> <span class="dv">100</span>)</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>()</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>features_list <span class="op">=</span> [<span class="st">'sepal_length'</span>, <span class="st">'sepal_width'</span>, <span class="st">'petal_length'</span>, <span class="st">'petal_width'</span>]</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>normality_test(df<span class="op">=</span>iris, feature_list<span class="op">=</span>features_list, tolerance<span class="op">=</span><span class="fl">0.05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>====================================================================================================
+Kolmogorov–Smirnov test: The test statistic and p-value of sepal_length are 0.080 and 0.725
+According to KS-Test the feature sepal_length is NORMALLY DISTRIBUTED!
+====================================================================================================
+
+====================================================================================================
+Shapiro-Wilk Test: The test statistic and p-value of sepal_length are 0.976 and 0.010
+According to Shapiro-Wilk the feature sepal_length is NOT NORMALLY DISTRIBUTED.
+====================================================================================================
+
+====================================================================================================
+D’Agostino-Pearson Test: The test statistic and p-value of sepal_length are 5.736 and 0.057
+According to D’Agostino-Pearson test the feature sepal_length is NORMALLY DISTRIBUTED!
+====================================================================================================
+
+====================================================================================================
+Kolmogorov–Smirnov test: The test statistic and p-value of sepal_width are 0.173 and 0.022
+According to KS-Test the feature sepal_width is NOT NORMALLY DISTRIBUTED.
+====================================================================================================
+
+====================================================================================================
+Shapiro-Wilk Test: The test statistic and p-value of sepal_width are 0.985 and 0.101
+According to Shapiro-Wilk the feature sepal_width is NORMALLY DISTRIBUTED!
+====================================================================================================
+
+====================================================================================================
+D’Agostino-Pearson Test: The test statistic and p-value of sepal_width are 3.124 and 0.210
+According to D’Agostino-Pearson test the feature sepal_width is NORMALLY DISTRIBUTED!
+====================================================================================================
+
+====================================================================================================
+Kolmogorov–Smirnov test: The test statistic and p-value of petal_length are 0.213 and 0.002
+According to KS-Test the feature petal_length is NOT NORMALLY DISTRIBUTED.
+====================================================================================================
+
+====================================================================================================
+Shapiro-Wilk Test: The test statistic and p-value of petal_length are 0.876 and 0.000
+According to Shapiro-Wilk the feature petal_length is NOT NORMALLY DISTRIBUTED.
+====================================================================================================
+
+====================================================================================================
+D’Agostino-Pearson Test: The test statistic and p-value of petal_length are 221.687 and 0.000
+According to D’Agostino-Pearson test the feature petal_length is NOT NORMALLY DISTRIBUTED.
+====================================================================================================
+
+====================================================================================================
+Kolmogorov–Smirnov test: The test statistic and p-value of petal_width are 0.180 and 0.015
+According to KS-Test the feature petal_width is NOT NORMALLY DISTRIBUTED.
+====================================================================================================
+
+====================================================================================================
+Shapiro-Wilk Test: The test statistic and p-value of petal_width are 0.902 and 0.000
+According to Shapiro-Wilk the feature petal_width is NOT NORMALLY DISTRIBUTED.
+====================================================================================================
+
+====================================================================================================
+D’Agostino-Pearson Test: The test statistic and p-value of petal_width are 137.556 and 0.000
+According to D’Agostino-Pearson test the feature petal_width is NOT NORMALLY DISTRIBUTED.
+====================================================================================================
+</code></pre>
+</div>
+</div>
+<p>We notice that all three tests are in perfect agreement on petal length and petal width. These two features are definitely not normally distributed. However, the tests vary in their agreements on whether sepal length and width is normal or not. Both KS-Test and D’Agostino-Pearson say that sepal_length is normally distributed at 95% confidence interval. Likewise, Shapiro-Wilk and D’Agostino-Pearson say that sepal width is normally distributed. These disagreements are typically because of the size of the dataset and also presence of many identical values in the response variable we are working with.</p>
+</section>
+</section>
+<section id="transforming-data-to-standard-normal-distribution-z-scores" class="level2">
+<h2 class="anchored" data-anchor-id="transforming-data-to-standard-normal-distribution-z-scores">3. Transforming Data to Standard Normal Distribution: Z-Scores</h2>
+<p>A z-score, or standard score, is used for standardizing scores on the same scale by dividing a score’s deviation by the standard deviation in a data set. The result is a standard score. It measures the number of standard deviations that a given data point is from the mean. You would use z-score to ensure your feature distributions have mean = 0 and std = 1.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-21T21:26:11.788233600Z&quot;,&quot;start_time&quot;:&quot;2023-11-21T21:26:11.330059300Z&quot;}" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> transform_iris_normal():</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    iris_scaled <span class="op">=</span> iris.copy()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> feature <span class="kw">in</span> features_list:</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        feature_mean <span class="op">=</span> np.mean(iris_scaled[feature])</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        feature_std <span class="op">=</span> np.std(iris_scaled[feature])</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        iris_scaled[feature] <span class="op">=</span> iris_scaled[feature].<span class="bu">apply</span>(<span class="kw">lambda</span> f: (f <span class="op">-</span> feature_mean) <span class="op">/</span> feature_std)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> iris_scaled</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>iris_scaled_df <span class="op">=</span> transform_iris_normal()</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>iris_histogram_plotter(df<span class="op">=</span>iris_scaled_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-7-output-1.png" width="1254" height="1189"></p>
+</div>
+</div>
+<p>The features are now transformed and each value indicate the number of standard deviations that a given observation is above or below the mean.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-21T21:26:11.793530700Z&quot;,&quot;start_time&quot;:&quot;2023-11-21T21:26:11.788233600Z&quot;}" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>mean <span class="op">=</span> np.mean(iris_scaled_df[<span class="st">'sepal_length'</span>].<span class="bu">round</span>(<span class="dv">2</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>sd <span class="op">=</span> np.std(iris_scaled_df[<span class="st">'sepal_length'</span>].<span class="bu">round</span>(<span class="dv">2</span>))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Sepal Length Mean after Z-Score Transformation : </span><span class="sc">{</span>mean<span class="sc">:.2f}</span><span class="ss"> "</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Sepal Length Standard Deviation after Z-Score Transformation : </span><span class="sc">{</span>sd<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Sepal Length Mean after Z-Score Transformation : 0.00 
+Sepal Length Standard Deviation after Z-Score Transformation : 1.00</code></pre>
+</div>
+</div>
+
+
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
