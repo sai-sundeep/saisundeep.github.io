@@ -1,9 +1,240 @@
 ---
-title: "Probability Theory and Random Variables"
+title: "Probability Theory - Gaussian Distribution, Normality Tests, and Z-Scores"
 author: "Sai Sundeep Rayidi"
-date: "2023-10-03"
-categories: [probability theory, code, analysis, random variables]
-image: "probability.jpg"
+date: "2023-11-21"
+categories: [Probability Theory, Gaussian Distribution, Visualization, Normality Test]
+image: "Standard_deviation_diagram_micro.png"
+jupyter: python3
 ---
 
-This is a post with executable code.
+
+In this blogpost, we will be discussing an important topic in statistics and machine learning - the *Gaussian Distribution*, also called the *Normal Distribution*. It is used to model many natural phenomena in the world, from people's heights to size of snowflakes, errors in measurements, and other financial and forecasting data. We will talk about why gaussian distribution is important in machine learning and how many ML algorithms assume that underlying data is normally distributed. We will explore some graphical and numerical methods to perform normality tests on data. Finally, we will try to transform the data to standard normal distribution by calculating *z-scores*. At a high level, we will explore -
+
+1. Normal Distribution and Machine Learning
+2. Normality Tests
+    * Graphical Methods
+    * Statistical Normality Tests
+3. Transformation to Standard Normal Distribution (Scaling): Z-Scores
+
+
+We will be working with the **iris** dataset throughout this blogpost.
+
+
+## 1. Normal Distribution and Machine Learning
+
+
+A normal distribution is a probability distribution that is symmetric about the mean, showing that data near the mean are more frequent in occurrence than data far from the mean. It is also known as the Gaussian distribution. The standard normal distribution is a normal distribution with zero mean and unit variance. The normal distribution has several key features and properties that define it. First, its mean (average), median (midpoint), and mode (most frequent observation) are all equal to one another. Moreover, these values all represent the peak, or highest point, of the distribution. The distribution then falls symmetrically around the mean, the width of which is defined by the standard deviation.
+
+All normal distributions can be described by just two parameters: the mean and the standard deviation. The Empirical Rule states that for all normal distributions, 68.2% of the observations will appear within plus or minus one standard deviation of the mean; 95.4% of the observations will fall within +/- two standard deviations; and 99.7% within +/- three standard deviations. This fact is sometimes referred to as the "empirical rule," a heuristic that describes where most of the data in a normal distribution will appear. This means that data falling outside of three standard deviations ("3-sigma") would signify rare occurrences
+
+![Standard Normal Distribution](Standard_deviation_diagram_micro.png)
+
+Machine learning models can be classified into two categories: parametric and non-parametric methods.
+
+Parametric methods are those that require the specification of some parameters before they can be used to make predictions. These models make assumptions about the distribution of the data, and the parameters are estimated from the training data. They are generally simpler and faster to train and do not require huge amounts of data contrary to non-parametric methods. Non-parametric models do not make any assumptions about the distribution of the data and instead rely on the data itself to determine the model structure, they may be slower to train and require more data to achieve good performance.
+
+It is usually good practice to first try parametric models like Linear Regression, Logistic Regression, Linear Discriminant Analysis (LDA), and Gaussian Naive Bias before exploring other non-parametric methods and advanced models. Furthermore, converting the data into a normal distribution allows for fair comparisons of features with different distributions and scales and improve the accuracy of predictions.
+
+Let us start importing some packages and exploring the diamonds dataset and its features.
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-21T21:26:10.370907400Z', start_time: '2023-11-21T21:26:10.320453200Z'}
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import scipy
+import warnings
+
+warnings.simplefilter('ignore', UserWarning)
+iris = sns.load_dataset('iris')
+iris.head(10)
+# iris.columns #'sepal_length', 'sepal_width', 'petal_length', 'petal_width','species'
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-21T21:26:10.496740Z', start_time: '2023-11-21T21:26:10.336354Z'}
+plt.figure()
+sns.histplot(iris, x='sepal_length', kde=True)
+plt.title("Distribution of \"sepal_length\" Feature")
+plt.show()
+```
+
+A variable that is normally distributed has a histogram (or "density function") that is bell-shaped, with only one peak, and is symmetric around the mean. The sepal_length feature does seem to resember the bell-shaped curve and can be normally distributed, lets us explore the other numeric features as well.
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-21T21:26:11.002772900Z', start_time: '2023-11-21T21:26:10.476596200Z'}
+def iris_histogram_plotter(df):
+    features_list = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
+    counter = 0
+    fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(16, 15))
+    for i in range(2):
+        for j in range(2):
+            sns.histplot(df, x=features_list[counter], kde=True, ax=axs[i][j])
+            axs[i][j].set_title(f"Distribution of \"{features_list[counter]}\" Feature")
+            counter += 1
+    plt.show()
+
+iris_histogram_plotter(df=iris)
+```
+
+We can see that amongst the four sepal_length and sepal_width features seem normally distributed. However, we will need to use more rigid tests to assess the normality of these features.
+
+## 2. Normality Tests
+
+A normality test is used to determine whether sample data has been drawn from a normally distributed population (within some tolerance). We can use graphical/visual methods or normality tests to assess normality of the data.
+
+### 2.1 Graphical Methods
+Although somewhat unreliable and does not always guarantee that the distribution is normal, visual inspection is a very helpful step in assessing normality. The frequency distributions (histogram) we plotted earlier are one of the visual techniques. Other methods like stem-and-leaf plot, boxplot, P-P (probability-probability) plot, and **Q-Q plot (quantile-quantile plot)** are used for checking normality visually. We already explored histogram plot, we will plot Q-Q plot to test normality of numerical features in iris dataset. If the data is normally distributed for a feature, the points will fall on the 45-degree reference line.
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-21T21:26:11.314085Z', start_time: '2023-11-21T21:26:10.987109700Z'}
+from statsmodels.graphics.gofplots import qqplot
+
+features_list = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
+fig = plt.figure(figsize=(10, 10))
+ax1 = fig.add_subplot(221)
+qqplot(iris['sepal_length'], line='s', ax=ax1)
+ax1.set_title("QQ-plot - Normality Test for \"sepal_length\" feature")
+ax1.grid()
+
+ax2 = fig.add_subplot(222)
+qqplot(iris['petal_length'], line='s', ax=ax2)
+ax2.set_title("QQ-plot - Normality Test for \"petal_length\" feature")
+ax2.grid()
+
+ax1 = fig.add_subplot(223)
+qqplot(iris['sepal_width'], line='s', ax=ax1)
+ax1.set_title("QQ-plot - Normality Test for \"sepal_width\" feature")
+ax1.grid()
+
+ax2 = fig.add_subplot(224)
+qqplot(iris['petal_width'], line='s', ax=ax2)
+ax2.set_title("QQ-plot - Normality Test for \"petal_width\" feature")
+ax2.grid()
+
+plt.show()
+```
+
+Once again, we can see sepal length and width closely follow the standardized line while the petal length and petal width do not fit properly against the reference normal distribution.
+
+### 2.2 Statistical Normality Tests
+
+The Statistical Normality Tests are supplementary to the graphical assessment of normality. Read [here](https://en.wikipedia.org/wiki/Normality_test#Frequentist_tests) for a complete list of normality tests. The main tests for the assessment of normality are -
+
+**[Kolmogorov-Smirnov (K-S) test](https://en.wikipedia.org/wiki/D%27Agostino%27s_K-squared_test)** or KS test is a nonparametric test of equality of a continuous one-dimensional probability distributions. It can be used to compare a sample with a reference probability distribution (like the samples drawn from normal distribution) or to compare two samples. The Kolmogorov–Smirnov statistic quantifies a distance between the empirical distribution function of the sample and the cumulative distribution function of the reference normal distribution. The empirical distribution function $F_n$ for n independent and identically distributed ordered observations $X_i$ is defined as -
+
+$$ {\displaystyle F_{n}(x)={\frac {{\text{number of (elements in the sample}}\leq x)}{n}}={\frac {1}{n}}\sum _{i=1}^{n}1_{(-\infty ,x]}(X_{i}),} $$
+
+
+A limitation of the K-S test is its high sensitivity to extreme values.
+
+**[Shapiro-Wilk test](https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test)** is based on the correlation between the data and the corresponding normal scores and provides better power than the K-S test. The test works by ordering and  standardizing the samples $\mu=0$ and $\sigma=1$. The test statistic is given by the formula -
+
+$$ {\displaystyle W={\left(\sum _{i=1}^{n}a_{i}x_{(i)}\right)^{2} \over \sum _{i=1}^{n}(x_{i}-{\overline {x}})^{2}},} $$
+
+One disadvantage is the Shapiro–Wilk test is known not to work well in samples with many identical values.
+
+
+**[D'Agostino's K-squared test](https://en.wikipedia.org/wiki/D%27Agostino%27s_K-squared_test)** is a statistical test that measures how well a given dataset fits a normal distribution. The test is based on the sample skewness and kurtosis, which are measures of the asymmetry and peakedness of the data, respectively. The test statistic is calculated as the sum of the squares of the standardized deviations of the sample skewness and kurtosis from their expected values under the assumption of normality. The test statistic is then compared to a chi-squared distribution with two degrees of freedom, and the p-value is calculated. If the p-value is less than the significance level, then the null hypothesis that the data is normally distributed is rejected. Otherwise, the null hypothesis is not rejected.
+
+D'Agostino's K-squared test is generally preferred over Shapiro-Wilk when the sample size is large.
+
+Let us import these methods from scipy.stats module, to test the normality of our iris dataset features.
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-21T21:26:11.330059300Z', start_time: '2023-11-21T21:26:11.314085Z'}
+from scipy.stats import kstest, shapiro, normaltest
+
+np.random.seed(5805)
+def calc_ks_test_statistics(sample):
+    sample_mean = np.mean(sample)
+    sample_sd = np.std(sample)
+    reference_normal_dist = np.random.normal(sample_mean, sample_sd, len(sample))
+    statistic, p_value = kstest(sample, reference_normal_dist)
+    return statistic, p_value
+
+def calc_shapiro_test_statistics(sample):
+        statistic, p_value = shapiro(sample)
+        return statistic, p_value
+
+def calc_dk2_test_statistics(sample):
+        statistic, p_value = normaltest(sample)
+        return statistic, p_value
+
+
+def normality_test(df, feature_list, tolerance):
+    for feature in feature_list:
+        print('=' * 100)
+        ks_statistic, ks_pvalue = calc_ks_test_statistics(df[feature])
+        print(f"Kolmogorov–Smirnov test: The test statistic and p-value of {feature} are {ks_statistic:.3f} and {ks_pvalue:.3f}")
+        if ks_pvalue < tolerance:
+            print(f"According to KS-Test the feature {feature} is NOT NORMALLY DISTRIBUTED.")
+        else:
+            print(f"According to KS-Test the feature {feature} is NORMALLY DISTRIBUTED!")
+        print('=' * 100)
+        print()
+
+        print('=' * 100)
+        shapiro_statistic, shapiro_pvalue = calc_shapiro_test_statistics(df[feature])
+        print(f"Shapiro-Wilk Test: The test statistic and p-value of {feature} are {shapiro_statistic:.3f} and {shapiro_pvalue:.3f}")
+        if shapiro_pvalue < tolerance:
+            print(f"According to Shapiro-Wilk the feature {feature} is NOT NORMALLY DISTRIBUTED.")
+        else:
+            print(f"According to Shapiro-Wilk the feature {feature} is NORMALLY DISTRIBUTED!")
+        print('=' * 100)
+        print()
+
+
+        print('=' * 100)
+        dk2_statistic, dk2_pvalue = calc_dk2_test_statistics(df[feature])
+        print(f"D’Agostino-Pearson Test: The test statistic and p-value of {feature} are {dk2_statistic:.3f} and {dk2_pvalue:.3f}")
+        if dk2_pvalue < tolerance:
+            print(f"According to D’Agostino-Pearson test the feature {feature} is NOT NORMALLY DISTRIBUTED.")
+        else:
+            print(f"According to D’Agostino-Pearson test the feature {feature} is NORMALLY DISTRIBUTED!")
+        print('=' * 100)
+        print()
+
+features_list = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
+normality_test(df=iris, feature_list=features_list, tolerance=0.05)
+```
+
+We notice that all three tests are in perfect agreement on petal length and petal width. These two features are definitely not normally distributed. However, the tests vary in their agreements on whether sepal length and width is normal or not. Both KS-Test and D’Agostino-Pearson say that sepal_length is normally distributed at 95% confidence interval. Likewise, Shapiro-Wilk and D’Agostino-Pearson say that sepal width is normally distributed. These disagreements are typically because of the size of the dataset and also presence of many identical values in the response variable we are working with. 
+
+## 3. Transforming Data to Standard Normal Distribution: Z-Scores
+
+A z-score, or standard score, is used for standardizing scores on the same scale by dividing a score's deviation by the standard deviation in a data set. The result is a standard score. It measures the number of standard deviations that a given data point is from the mean. You would use z-score to ensure your feature distributions have mean = 0 and std = 1.
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-21T21:26:11.788233600Z', start_time: '2023-11-21T21:26:11.330059300Z'}
+def transform_iris_normal():
+    iris_scaled = iris.copy()
+    for feature in features_list:
+        feature_mean = np.mean(iris_scaled[feature])
+        feature_std = np.std(iris_scaled[feature])
+        iris_scaled[feature] = iris_scaled[feature].apply(lambda f: (f - feature_mean) / feature_std)
+    return iris_scaled
+
+iris_scaled_df = transform_iris_normal()
+iris_histogram_plotter(df=iris_scaled_df)
+```
+
+The features are now transformed and each value indicate the number of standard deviations that a given observation is above or below the mean.
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-21T21:26:11.793530700Z', start_time: '2023-11-21T21:26:11.788233600Z'}
+mean = np.mean(iris_scaled_df['sepal_length'].round(2))
+sd = np.std(iris_scaled_df['sepal_length'].round(2))
+print(f"Sepal Length Mean after Z-Score Transformation : {mean:.2f} ")
+print(f"Sepal Length Standard Deviation after Z-Score Transformation : {sd:.2f}")
+```
+
+
