@@ -31,7 +31,7 @@ website:
         href: https://www.linkedin.com/in/sai-sundeep-rayidi-7256b4245/
 format:
   html:
-    theme: simplex
+    theme: superhero
     css: styles.css
 
 
