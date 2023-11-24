@@ -60,6 +60,7 @@ We can see that most of the data is 0 with few values here and there. That is be
 ```{python}
 #| collapsed: false
 #| ExecuteTime: {end_time: '2023-11-18T03:34:11.103756500Z', start_time: '2023-11-18T03:34:03.856649200Z'}
+#| fig-width: 10
 # Visualize the Images in the Dataset
 labels_list = list(fmnist_train_df['label'].unique())
 labels_list.sort()

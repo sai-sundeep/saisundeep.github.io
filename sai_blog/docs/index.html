@@ -36,10 +36,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -71,8 +71,7 @@ ul.task-list li input[type="checkbox"] {
 
     const options = {
       valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      page: 3,
-    pagination: { item: "<li class='page-item'><a class='page page-link' href='#'></a></li>" },
+      
       searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
     };
 
@@ -174,7 +173,7 @@ ul.task-list li input[type="checkbox"] {
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(7)</span></div><div class="category" data-category="Confusion Matrix">Confusion Matrix <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Gaussian Distribution">Gaussian Distribution <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Multi-Class">Multi-Class <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Normality Test">Normality Test <span class="quarto-category-count">(1)</span></div><div class="category" data-category="PCA analysis">PCA analysis <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Probability Theory">Probability Theory <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RandomizedSearch">RandomizedSearch <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Visualization">Visualization <span class="quarto-category-count">(1)</span></div><div class="category" data-category="analysis">analysis <span class="quarto-category-count">(3)</span></div><div class="category" data-category="anomaly detection">anomaly detection <span class="quarto-category-count">(1)</span></div><div class="category" data-category="classification">classification <span class="quarto-category-count">(1)</span></div><div class="category" data-category="clustering">clustering <span class="quarto-category-count">(1)</span></div><div class="category" data-category="code">code <span class="quarto-category-count">(4)</span></div><div class="category" data-category="f1-score">f1-score <span class="quarto-category-count">(1)</span></div><div class="category" data-category="news">news <span class="quarto-category-count">(3)</span></div><div class="category" data-category="polynomial regression">polynomial regression <span class="quarto-category-count">(1)</span></div><div class="category" data-category="precision">precision <span class="quarto-category-count">(1)</span></div><div class="category" data-category="recall">recall <span class="quarto-category-count">(1)</span></div><div class="category" data-category="regression">regression <span class="quarto-category-count">(1)</span></div><div class="category" data-category="scatter plot">scatter plot <span class="quarto-category-count">(1)</span></div><div class="category" data-category="visualization">visualization <span class="quarto-category-count">(2)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(6)</span></div><div class="category" data-category="Confusion Matrix">Confusion Matrix <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Gaussian Distribution">Gaussian Distribution <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Multi-Class">Multi-Class <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Normality Test">Normality Test <span class="quarto-category-count">(1)</span></div><div class="category" data-category="PCA analysis">PCA analysis <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Probability Theory">Probability Theory <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RandomizedSearch">RandomizedSearch <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Visualization">Visualization <span class="quarto-category-count">(1)</span></div><div class="category" data-category="analysis">analysis <span class="quarto-category-count">(3)</span></div><div class="category" data-category="anomaly detection">anomaly detection <span class="quarto-category-count">(1)</span></div><div class="category" data-category="classification">classification <span class="quarto-category-count">(1)</span></div><div class="category" data-category="clustering">clustering <span class="quarto-category-count">(1)</span></div><div class="category" data-category="code">code <span class="quarto-category-count">(4)</span></div><div class="category" data-category="f1-score">f1-score <span class="quarto-category-count">(1)</span></div><div class="category" data-category="news">news <span class="quarto-category-count">(3)</span></div><div class="category" data-category="polynomial regression">polynomial regression <span class="quarto-category-count">(1)</span></div><div class="category" data-category="precision">precision <span class="quarto-category-count">(1)</span></div><div class="category" data-category="recall">recall <span class="quarto-category-count">(1)</span></div><div class="category" data-category="regression">regression <span class="quarto-category-count">(1)</span></div><div class="category" data-category="scatter plot">scatter plot <span class="quarto-category-count">(1)</span></div><div class="category" data-category="visualization">visualization <span class="quarto-category-count">(2)</span></div></div></div>
 <!-- main -->
 <main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
 
@@ -275,9 +274,9 @@ Sai Sundeep Rayidi
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="regression,news,code,analysis,polynomial regression" data-listing-date-sort="1697169600000" data-listing-file-modified-sort="1698877891332" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1">
+<div class="quarto-post image-right" data-index="2" data-categories="regression,news,code,analysis,polynomial regression" data-listing-date-sort="1697169600000" data-listing-file-modified-sort="1700793052532" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6">
 <div class="thumbnail">
-<p><a href="./posts/Regression/index.html"> <img src="./posts/Regression/regression.png" class="thumbnail-image"> </a></p>
+<p><a href="./posts/Regression/index.html"> <p class="card-img-top"><img src="posts\Regression\index_files\figure-html\cell-4-output-1.png"  class="thumbnail-image card-img"/></p> </a></p>
 </div>
 <div class="body">
 <a href="./posts/Regression/index.html">
@@ -324,7 +323,7 @@ Sai Sundeep Rayidi
 </div>
 <div class="quarto-post image-right" data-index="3" data-categories="anomaly detection,news,code,analysis" data-listing-date-sort="1697688000000" data-listing-file-modified-sort="1698877891332" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1">
 <div class="thumbnail">
-<p><a href="./posts/Anomaly Detection/index.html"> <img data-src="./posts/Anomaly Detection/anomaly.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/Anomaly Detection/index.html"> <img src="./posts/Anomaly Detection/anomaly.jpg" class="thumbnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/Anomaly Detection/index.html">
@@ -368,7 +367,7 @@ Sai Sundeep Rayidi
 </div>
 <div class="quarto-post image-right" data-index="4" data-categories="classification,precision,recall,f1-score,code,PCA analysis,Confusion Matrix,RandomizedSearch,visualization,Multi-Class" data-listing-date-sort="1700283600000" data-listing-file-modified-sort="1700792460294" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15">
 <div class="thumbnail">
-<p><a href="./posts/Classification/index.html"> <p class="card-img-top"><img data-src="posts\Classification\index_files\figure-html\cell-6-output-1.png"  class="thumbnail-image card-img"/></p> </a></p>
+<p><a href="./posts/Classification/index.html"> <p class="card-img-top"><img src="posts\Classification\index_files\figure-html\cell-6-output-1.png"  class="thumbnail-image card-img"/></p> </a></p>
 </div>
 <div class="body">
 <a href="./posts/Classification/index.html">
@@ -430,7 +429,7 @@ Sai Sundeep Rayidi
 </div>
 <div class="quarto-post image-right" data-index="5" data-categories="Probability Theory,Gaussian Distribution,Visualization,Normality Test" data-listing-date-sort="1700542800000" data-listing-file-modified-sort="1700602412572" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11">
 <div class="thumbnail">
-<p><a href="./posts/Probability Theory and Random Variables/index.html"> <img data-src="./posts/Probability Theory and Random Variables/Standard_deviation_diagram_micro.png" class="thumbnail-image"> </a></p>
+<p><a href="./posts/Probability Theory and Random Variables/index.html"> <img src="./posts/Probability Theory and Random Variables/Standard_deviation_diagram_micro.png" class="thumbnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/Probability Theory and Random Variables/index.html">
@@ -472,34 +471,10 @@ Sai Sundeep Rayidi
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="6" data-listing-file-modified-sort="1698877891332" data-listing-reading-time-sort="6">
-<div class="thumbnail">
-<p><a href="./posts/Regression/diamonds_regression.html"> <p class="card-img-top"><img data-src="posts\Regression\diamonds_regression_files\figure-html\cell-4-output-1.png"  class="thumbnail-image card-img"/></p> </a></p>
-</div>
-<div class="body">
-<a href="./posts/Regression/diamonds_regression.html">
-<h3 class="no-anchor listing-title">
-Analyzing distribution of numeric features with histogram plot
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./posts/Regression/diamonds_regression.html"> </a>
-</div>
-</div>
 </div>
 <div class="listing-no-matching d-none">
 No matching items
 </div>
-<nav id="listing-pagination" class="listing-pagination" aria-label="Page Navigation">
-  <ul class="pagination"></ul>
-</nav>
 </div><a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
