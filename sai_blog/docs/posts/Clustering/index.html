@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Sai Sundeep Rayidi">
-<meta name="dcterms.date" content="2023-10-05">
+<meta name="dcterms.date" content="2023-11-29">
 
 <title>Sai’s ML blog - Unsupervised Learning: Clustering Using K-Means and Gaussian Mixture Models</title>
 <style>
@@ -101,10 +101,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="../../styles.css">
 <meta property="og:title" content="Sai’s ML blog - Unsupervised Learning: Clustering Using K-Means and Gaussian Mixture Models">
 <meta property="og:description" content="">
-<meta property="og:image" content="https://sai-sundeep.github.io/saisundeep.github.io/posts/Clustering/clustering.png">
+<meta property="og:image" content="clustering.png">
 <meta property="og:site-name" content="Sai's ML blog">
-<meta property="og:image:height" content="576">
-<meta property="og:image:width" content="1024">
 </head>
 
 <body class="nav-fixed fullcontent">
@@ -164,10 +162,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <h1 class="title">Unsupervised Learning: Clustering Using K-Means and Gaussian Mixture Models</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">clustering</div>
-                <div class="quarto-category">code</div>
-                <div class="quarto-category">scatter plot</div>
                 <div class="quarto-category">analysis</div>
                 <div class="quarto-category">visualization</div>
+                <div class="quarto-category">K-Means</div>
               </div>
                   </div>
   </div>
@@ -185,7 +182,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">October 5, 2023</p>
+        <p class="date">November 29, 2023</p>
       </div>
     </div>
     
@@ -214,9 +211,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul></li>
 <li>Gaussian Mixture Models</li>
 </ul>
-<section id="import-and-analyze-diamonds-dataset" class="level2">
-<h2 class="anchored" data-anchor-id="import-and-analyze-diamonds-dataset">1. Import and Analyze Diamonds Dataset</h2>
-<p>The diamonds dataset is available in the seaborn visualization package. Let’s load the dataset and analyze its features and instances.</p>
+<section id="import-and-analyze-penguins-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="import-and-analyze-penguins-dataset">1. Import and Analyze Penguins Dataset</h2>
+<p>The penguins dataset is available in the seaborn visualization package. Let’s load the dataset and analyze its features and instances.</p>
 <div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-29T13:22:27.366216300Z&quot;,&quot;start_time&quot;:&quot;2023-11-29T13:22:27.334241700Z&quot;}" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -367,8 +364,8 @@ sex                                 0.0</code></pre>
 <span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Scatter plot of Reduced Data - PCA1 vs PCA3"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>The Cluster Centers are - 
-[[ 2.01297608 -0.39402785 -0.03586763]
- [-1.58950101 -0.3000391  -0.2218791 ]
+[[-1.58950101 -0.3000391  -0.2218791 ]
+ [ 2.01297608 -0.39402785 -0.03586763]
  [-0.39177408  1.02255234  0.3941968 ]]</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="6">
@@ -465,7 +462,7 @@ Score:  -334.92198044554704</code></pre>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Weights of Clusters from Raw Data: </span><span class="ch">\n</span><span class="ss"> </span><span class="sc">{</span>raw_weights<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Weights of Clusters formed by GMM: 
-         [19.94 35.74 44.32]
+         [35.74 44.32 19.94]
 
 Weights of Clusters from Raw Data: 
  species
@@ -481,22 +478,22 @@ Name: count, dtype: float64</code></pre>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Covariance Matrix for each corresponding distribution: </span><span class="ch">\n</span><span class="ss"> </span><span class="sc">{</span>(gm.covariances_)<span class="sc">.</span><span class="bu">round</span>(<span class="dv">3</span>)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Cluster Centroids: 
- [[-0.344  1.039  0.714]
- [ 2.013 -0.394 -0.036]
- [-1.468 -0.15  -0.292]]
+ [[ 2.013 -0.394 -0.036]
+ [-1.468 -0.15  -0.292]
+ [-0.344  1.039  0.714]]
 
 Covariance Matrix for each corresponding distribution: 
- [[[ 0.267  0.241 -0.1  ]
-  [ 0.241  0.54  -0.096]
-  [-0.1   -0.096  0.208]]
-
- [[ 0.394  0.372 -0.159]
+ [[[ 0.394  0.372 -0.159]
   [ 0.372  0.504 -0.176]
   [-0.159 -0.176  0.196]]
 
  [[ 0.28   0.173 -0.087]
   [ 0.173  0.472 -0.203]
-  [-0.087 -0.203  0.265]]]</code></pre>
+  [-0.087 -0.203  0.265]]
+
+ [[ 0.267  0.241 -0.1  ]
+  [ 0.241  0.54  -0.096]
+  [-0.1   -0.096  0.208]]]</code></pre>
 </div>
 </div>
 <div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-29T19:44:59.008190800Z&quot;,&quot;start_time&quot;:&quot;2023-11-29T19:44:58.882140800Z&quot;}" data-execution_count="14">
