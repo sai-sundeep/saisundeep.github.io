@@ -3,11 +3,11 @@
     "listing": "/index.html",
     "items": [
       "/posts/welcome/index.html",
-      "/posts/Clustering/index.html",
       "/posts/Regression/index.html",
       "/posts/Anomaly Detection/index.html",
       "/posts/Classification/index.html",
-      "/posts/Probability Theory and Random Variables/index.html"
+      "/posts/Probability Theory and Random Variables/index.html",
+      "/posts/Clustering/index.html"
     ]
   }
 ]
