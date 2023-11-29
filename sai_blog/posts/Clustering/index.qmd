@@ -2,7 +2,7 @@
 title: "Unsupervised Learning: Clustering Using K-Means and Gaussian Mixture Models"
 author: "Sai Sundeep Rayidi"
 date: "2023-11-29"
-categories: [clustering, code, scatter plot, analysis, visualization]
+categories: [clustering, analysis, visualization, K-Means]
 image: "clustering.png"
 jupyter: python3
 ---
