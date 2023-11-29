@@ -1,9 +1,280 @@
 ---
-title: "Clustering"
+title: "Unsupervised Learning: Clustering Using K-Means and Gaussian Mixture Models"
 author: "Sai Sundeep Rayidi"
 date: "2023-10-05"
 categories: [clustering, code, scatter plot, analysis, visualization]
 image: "clustering.png"
+jupyter: python3
 ---
 
-This is a post with executable code.
+So far we have seen regression and classification algorithms and their many variants. In this blog, we will be exploring another type of learning called Unsupervised Learning. Unlike in regression and classification where we have response variable or target classes, we will not have any predefined labels in unsupervised learning. It is up for the algorithm to learn the similarities and differences and then group the instances that belong together. We will be working with the **Penguins** dataset in this blog to perform unsupervised learning. At a high level, we will - 
+
+* Import and Analyze Penguins dataset
+* Perform **K-Means** Clustering
+* Evaluating K-Means Performance and Choosing Optimal Number of Clusters- 
+    * Inertia 
+    * Silhouette Score
+* Gaussian Mixture Models 
+
+
+## 1. Import and Analyze Diamonds Dataset
+
+The diamonds dataset is available in the seaborn visualization package. Let's load the dataset and analyze its features and instances. 
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-29T13:22:27.366216300Z', start_time: '2023-11-29T13:22:27.334241700Z'}
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+penguins = sns.load_dataset('penguins')
+print(f"Number of Features: {penguins.shape[0]}")
+print(f"Number of Observations: {penguins.shape[1]}")
+
+print(f"Features - {list(penguins.columns)}")
+```
+
+Let us see unique species, islands from the penguins dataset and also the range of values of the numerical features take using pandas describe method. Let us also ensure the dataset is free from any nulls or missing values (NaN) by calculating the percentage of Nulls or NaNs in each column.  
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-29T13:22:30.249085900Z', start_time: '2023-11-29T13:22:30.170485600Z'}
+# ['species', 'island', 'bill_length_mm', 'bill_depth_mm', 'flipper_length_mm', 'body_mass_g', 'sex']
+print(f"Unique colors: {penguins['species'].unique()}")
+print(f"Unique cut type: {penguins['island'].unique()}\n")
+
+print(penguins.describe(), '\n')
+
+percent_missing = ((penguins.isnull().sum() + penguins.isna().sum()) / len(penguins)) * 100
+missing_values_percent_df = percent_missing.to_frame('Missing Data Percent')
+print(missing_values_percent_df.round(2))
+```
+
+We do have missing or null values in five of the columns. Because this is a very small percentage, lets us drop these records. 
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-29T13:22:32.642428700Z', start_time: '2023-11-29T13:22:32.627914600Z'}
+penguins.dropna(inplace=True)
+print(f"Dataset Shaper After Removing Nulls: {penguins.shape}\n")
+percent_missing = ((penguins.isnull().sum() + penguins.isna().sum()) / len(penguins)) * 100
+missing_values_percent_df = percent_missing.to_frame('Missing Data Percent')
+print(missing_values_percent_df.round(2))
+```
+
+!Perfect. We now have cleaned the dataset from Nulls and NaNs. 
+
+Let us now visualize the features bill_length, bill_depth, and flipper_length using a scatterplot. For this you can use the pandas inbuilt scattermatrix plot. But using Seaborn helps us to add hue, using species labels. This helps us better differentiate the underlying clusters in our dataset.  
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-29T13:22:36.813393500Z', start_time: '2023-11-29T13:22:36.406419600Z'}
+fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(10, 6))
+axs[0] = sns.scatterplot(penguins, x='bill_length_mm', y='bill_depth_mm', hue='species', ax=axs[0])
+axs[1] = sns.scatterplot(penguins, x='flipper_length_mm', y='bill_length_mm', hue='species', ax=axs[1])
+plt.show()
+```
+
+Looks like our data does have an underlying clusters and we seem to have three clusters one for each species type - Adelie, Gentoo, and Chinstrap. We can now apply K-Means clustering.
+
+## 2. Apply K-Means Clustering
+
+K-means is an unsupervised learning algorithm that is capable of clustering a given dataset of instances quickly and efficiently into K clusters. It works by assigning K random instances as centroids to K clusters and then assign remaining instances as the members to a cluster that it is nearest to. It calculates the distance using the **mean squared distance** between the instances and their closest centroids. It then calculates the centroids using the newly formed clusters. And then the instances are re-assigned after computing the distance to newly formed clusters. This process continues until there is no further shift in centroids. To put it formally, the objective at each step is to minimize the following within-cluster sum of squares distance- 
+
+$$ {\displaystyle \mathop {\operatorname {arg\,min} } _{\mathbf {S} }\sum _{i=1}^{k}\sum _{\mathbf {x} \in S_{i}}\left\|\mathbf {x} -{\boldsymbol {\mu }}_{i}\right\|^{2}=\mathop {\operatorname {arg\,min} } _{\mathbf {S} }\sum _{i=1}^{k}|S_{i}|\operatorname {Var} S_{i}} $$
+
+where, 
+$x_i$ denote the n observations in the dataset $x_1, x_2, x_3, ..., x_n$
+$S_i = {S_1, S_2, S_3, ..., S_k}$ denote the k sets/clusters
+$\mu_i$ is the mean or centroid of the points in $S_i$
+
+Before we start applying K-means on penguins dataset, a couple of things to take care of. We need to scale our features. Clustering algorithms are sensitive to scale and Scaling ensures that all features in the data are weighted equally. This is very important because clustering algorithms use distance between data points to assess the similarity between them. A simple way to do this is transforming the features into their Z-scores. 
+
+$$ z={x-\mu  \over \sigma } $$ 
+
+We can simply pass the features to scikit-learns StandardScalar to do the same. 
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-29T13:23:05.967683400Z', start_time: '2023-11-29T13:23:05.710730100Z'}
+from sklearn.preprocessing import StandardScaler
+penguins_numerical_features = penguins.select_dtypes(include=np.number)
+scaler = StandardScaler()
+penguins_scaled = scaler.fit_transform(penguins_numerical_features)
+penguins_scaled_df = pd.DataFrame(penguins_scaled, columns=penguins_numerical_features.columns, index=None)
+```
+
+Great! our features are scaled. Now lets feed them to the K-Means algorithm to see if it can figure out the clusters in our dataset that we have found earlier. Let us set the initial number of clusters to be 3 because we know there to be three different species in our dataset. Initializing with correct number of clusters is not always possible, but in this case we have the ground truth, so we can use that to initialize k.
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-29T16:56:44.354248300Z', start_time: '2023-11-29T16:56:44.011878500Z'}
+from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans
+import matplotlib as mpl
+n_clusters = 3
+k = 3
+
+pca = PCA(n_components=3, svd_solver='full')
+penguins_reduced = pca.fit_transform(penguins_scaled_df)
+# print("Cumulative Explained Variance (%): ", np.cumsum(pca.explained_variance_ratio_ * 100).round(2))
+
+kmeans = KMeans(init="k-means++", n_clusters=3, n_init=4)
+kmeans.fit(penguins_reduced)
+k_means_cluster_centers = kmeans.cluster_centers_
+
+print(f"The Cluster Centers are - \n{k_means_cluster_centers}")
+
+# PC1 & PC2
+pd.DataFrame(
+    penguins_reduced, 
+    columns=['PC1', 'PC2', 'PC3']
+).plot.scatter(
+    x=0, y=1, c=kmeans.labels_, cmap='viridis', colorbar=False
+)
+plt.scatter(x=-0.39, y=1.103, s=100, c='r', marker='o')
+plt.scatter(x=-0.39, y=1.103, s=100, c='w', marker='x')
+plt.scatter(x=2.01, y=-0.394, s=100, c='r', marker='o')
+plt.scatter(x=2.01, y=-0.394, s=100, c='w', marker='x')
+plt.scatter(x=-1.5, y=-0.3, s=100, c='r', marker='o')
+plt.scatter(x=-1.5, y=-0.3, s=100, c='w', marker='x')
+plt.title("Scatter plot of Reduced Data - PCA1 vs PCA2")
+
+
+# PC1 & PC3
+pd.DataFrame(
+    penguins_reduced, 
+    columns=['PC1', 'PC2', 'PC3']
+).plot.scatter(
+    x=0, y=2, c=kmeans.labels_, cmap='viridis', colorbar=False
+)
+plt.scatter(x=-0.39, y=0.384, s=100, c='r', marker='o')
+plt.scatter(x=-0.39, y=0.384, s=100, c='w', marker='x')
+plt.scatter(x=2.01, y=-0.035, s=100, c='r', marker='o')
+plt.scatter(x=2.01, y=-0.035, s=100, c='w', marker='x')
+plt.scatter(x=-1.5, y=-0.22, s=100, c='r', marker='o')
+plt.scatter(x=-1.5, y=-0.22, s=100, c='w', marker='x')
+plt.title("Scatter plot of Reduced Data - PCA1 vs PCA3")
+```
+
+The k-means algorithm was able to create three clusters and assign the instances to these three clusters. As we can see from the above plot, the clusters on the left have some instances overlapping and there is no clear decision boundary. Let us now evaluate this model's performance.   
+
+## Evaluating K-Means Performance and Choosing Optimal Number of Clusters
+
+### 3.1 Inertia & Elbow Curve
+
+One way to initialize the number of clusters is to run a clustering algorithm and know what could be the approximate number of clusters. Anathor approach is to run the algorithm multiple times using different values for k, in scikit-learn KMeans this is controlled by n_init hyperparameter. At each random initialization some performance metric is calculated and the model with best performance is retained. For K-Means this metric is the model's **inertia**. It is calculated by summing the squared distances between each data point and its closest centroid. As you would guess, lower the inertia of the model, better the clustering. Scikit-learn also provides score() method, which is negative of the inertia. Higher the score value (closer to zero) better the performance. 
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-29T15:08:10.402774300Z', start_time: '2023-11-29T15:08:10.336585700Z'}
+print("Inertia: ", kmeans.inertia_)
+print("Score: ", kmeans.score(penguins_reduced))
+```
+
+The scores does not look so good even with a good initialization of n_clusters=3. This has to do with **Clusters of varying sizes and density.** k-means has trouble clustering data where clusters are of varying sizes and density. To see the inertia of the model initialized with different values of k, we can make use of the **elbow curve** as shown below. As we can see, the kmeans algorithm gives better performance with k greater than 3 (lower inertia). Which as we know is not correct. So inertia is not always perfect measure of the models performance.  
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-29T15:17:46.617196700Z', start_time: '2023-11-29T15:17:45.795311800Z'}
+kmeans_per_k = [KMeans(n_clusters=k, n_init=10, random_state=42).fit(penguins_reduced)
+                for k in range(1, 10)]
+inertias = [model.inertia_ for model in kmeans_per_k]
+
+plt.figure(figsize=(8, 3.5))
+plt.plot(range(1, 10), inertias, "bo-")
+plt.xlabel("$k$")
+plt.ylabel("Inertia")
+plt.axis([1, 8.5, 0, 1500])
+plt.grid('both')
+plt.show()
+```
+
+### 3.2 Silhouette Score
+
+A more precise but computationally expensive metric is the model's *Silhouette Score* which is calculated as the mean *silhouette coefficient* over all the instances. An instance's silhouette coefficient is calculated as $(b-a)/max(a, b)$, where a is the mean distances to other instances in the same cluster and b is the mean distance to the instances of the next closest cluster. The silhouette coefficient can vary between –1 and +1. A coefficient close to +1 means that the instance is well inside its own cluster and far from other clusters, while a coefficient close to 0 means that it is close to a cluster boundary; finally, a coefficient close to –1 means that the instance may have been assigned to the wrong cluster.   
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-29T15:30:22.275140700Z', start_time: '2023-11-29T15:30:22.180169400Z'}
+from sklearn.metrics import silhouette_score
+silhouette_score(penguins_reduced, kmeans.labels_)
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-29T15:32:01.884939800Z', start_time: '2023-11-29T15:32:01.766276900Z'}
+silhouette_scores = [silhouette_score(penguins_reduced, model.labels_)
+                     for model in kmeans_per_k[1:]]
+
+plt.figure(figsize=(8, 3))
+plt.plot(range(2, 10), silhouette_scores, "bo-")
+plt.xlabel("$k$")
+plt.ylabel("Silhouette score")
+# plt.axis([1.8, 8.5, 0.55, 0.7])
+plt.grid('both')
+plt.show()
+```
+
+Once again, we can see that for k greater than 3, the silhoutte score is getting closer to 0. Which suggests more instances are close to the cluster boundary. We need a better methodology to cluster our dataset.
+
+## 4. Gaussian Mixture Models
+
+The Gaussian Mixture Model is a probabilistic model that assumes that instances are drawn from multiple but finite number of Gaussian (normal) distributions whose parameters are unknown. Typically, all the instances generated from a single Gaussian distribution form an elliptical shaped cluster. There are several variations to [Gaussian Mixture Models](https://scikit-learn.org/stable/modules/mixture.html). The one we will implement using scikit-learn is the GaussianMixture which requires us to know the number of clusters (k) in advance. Usually, it is a good idea to run kmeans or mini-batch kmeans to help with figuring the optimum value for k. Given a dataset X, the GaussianMixture works as follows - 
+
+* For each instance in **X**, a cluster is randomly picked among *k* clusters. The probability of choosing a cluster $j$ is given by clusters weight $\theta(j)$ and the index of the cluster choosen for instance *i* is noted by $Z(i)$.
+* If instance *i* is assigned to cluster *j* i.e., $Z(i) = j$, then the location of this instance is sampled randomly from the Gaussian Distribution with $\mu(j)$ and covariance matrix $\Sigma(j)$. This is noted by $x(i) \sim \Nu(\mu(j), \Sigma(j))$
+
+GMMs are particularly useful when the data is not clearly separable into distinct clusters. We may be able to solve our problem with the cluster overlapping that we have seen with k-means clustering. Let us apply the GaussianMixture algorithm to our Penguins dataset. Let us set n_components and run the algorithm for 10 iterations. 
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-29T19:12:33.471211900Z', start_time: '2023-11-29T19:12:33.368140800Z'}
+from sklearn.mixture import GaussianMixture
+
+gm = GaussianMixture(n_components=3, n_init=10)
+y_labels = gm.fit_predict(penguins_reduced)
+```
+
+We can ectract the weights of the clusters formed by the GaussianMixtures algorithm and compare it with the weights of the raw dataset.
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-29T19:27:55.601120100Z', start_time: '2023-11-29T19:27:55.538163Z'}
+model_weights = (gm.weights_ * 100).round(2)
+raw_weights = ((penguins['species'].value_counts() / len(penguins)) * 100).round(2)
+
+print(f"Weights of Clusters formed by GMM: \n\t\t {model_weights}\n")
+print(f"Weights of Clusters from Raw Data: \n {raw_weights}")
+```
+
+Great! Our model is able to predict three clusters and the weights also look pretty close to percentage of different species we have in our dataset. Furthermore, the cluster centroids and the corresponding covariance matrices can be extracted using means_ and covariances_ parameters.  
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-29T19:34:13.152379200Z', start_time: '2023-11-29T19:34:13.136327500Z'}
+print(f"Cluster Centroids: \n {(gm.means_).round(3)}\n")
+print(f"Covariance Matrix for each corresponding distribution: \n {(gm.covariances_).round(3)}")
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-11-29T19:44:59.008190800Z', start_time: '2023-11-29T19:44:58.882140800Z'}
+plt.figure()
+plt.scatter(penguins_reduced[:, 0], penguins_reduced[:, 2], c=y_labels)    
+for i in range(3):    
+    plt.scatter(x=gm.means_[i][0], y=gm.means_[i][2], s=100, c='b', marker='o')
+    plt.scatter(x=gm.means_[i][0], y=gm.means_[i][2], s=100, c='w', marker='x')
+plt.title("Penguins Dataset Clustered using Gaussian Mixture Model")
+plt.xlabel(r'$x_1$')
+plt.ylabel(r'$x_3$')
+plt.show()
+```
+
+## Conclusion
+
+Unsupervised learning is an amazing and useful technique that can be used to discover hidden patterns and structures in data without the need for labeled examples. We have learned about Clustering and the most widely used and easy to implement K-Means Clustering. We learned that K-Means has some limitations and it is usually a good idea to start with k-means of one of its variants before trying out advanced clustering algorithms like DBSCAN or Gaussian Mixture Models. We have also seen how Gaussian Mixtures work and how to use them to train on data that has clusters closely packed and inseparable by other algorithms.  
+
+
