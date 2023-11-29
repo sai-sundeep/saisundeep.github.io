@@ -1,7 +1,7 @@
 ---
 title: "Unsupervised Learning: Clustering Using K-Means and Gaussian Mixture Models"
 author: "Sai Sundeep Rayidi"
-date: "2023-10-05"
+date: "2023-11-29"
 categories: [clustering, code, scatter plot, analysis, visualization]
 image: "clustering.png"
 jupyter: python3
@@ -17,9 +17,9 @@ So far we have seen regression and classification algorithms and their many vari
 * Gaussian Mixture Models 
 
 
-## 1. Import and Analyze Diamonds Dataset
+## 1. Import and Analyze Penguins Dataset
 
-The diamonds dataset is available in the seaborn visualization package. Let's load the dataset and analyze its features and instances. 
+The penguins dataset is available in the seaborn visualization package. Let's load the dataset and analyze its features and instances. 
 
 ```{python}
 #| collapsed: false
