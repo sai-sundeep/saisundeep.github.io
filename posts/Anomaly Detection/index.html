@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Sai Sundeep Rayidi">
-<meta name="dcterms.date" content="2023-10-19">
+<meta name="dcterms.date" content="2023-12-01">
 
-<title>Sai’s ML blog - Anomaly Detection</title>
+<title>Sai’s ML blog - Anomaly Detection and Synthetic Data Generation with Scikit-Learn</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -60,10 +94,15 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../../styles.css">
-<meta property="og:title" content="Sai’s ML blog - Anomaly Detection">
+<meta property="og:title" content="Sai’s ML blog - Anomaly Detection and Synthetic Data Generation with Scikit-Learn">
 <meta property="og:description" content="">
 <meta property="og:image" content="https://sai-sundeep.github.io/saisundeep.github.io/posts/Anomaly Detection/anomaly.jpg">
 <meta property="og:site-name" content="Sai's ML blog">
@@ -123,12 +162,11 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Anomaly Detection</h1>
+      <h1 class="title">Anomaly Detection and Synthetic Data Generation with Scikit-Learn</h1>
                                 <div class="quarto-categories">
-                <div class="quarto-category">anomaly detection</div>
-                <div class="quarto-category">news</div>
-                <div class="quarto-category">code</div>
-                <div class="quarto-category">analysis</div>
+                <div class="quarto-category">Anomaly Detection</div>
+                <div class="quarto-category">DBSCAN</div>
+                <div class="quarto-category">Synthetic Data</div>
               </div>
                   </div>
   </div>
@@ -146,7 +184,7 @@ ul.task-list li input[type="checkbox"] {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">October 19, 2023</p>
+        <p class="date">December 1, 2023</p>
       </div>
     </div>
     
@@ -164,9 +202,243 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<p>This is a post with executable code about Anomaly Detection using Machine Learning Algorithms.</p>
+<p>Until now, we have worked with real world datasets and applied several Machine Learning algorithms to them. Sometimes it is also useful to generate synthetic data that closely simulates some real-world examples. In this blogpost, we will see how to generate synthetic data with scikit-learn. Specifically, we will create clusters of data with some anomalies which helps us to learn and apply some Anomaly Detection algorithms. At a high level, we will -</p>
+<ul>
+<li>Generating Synthetic data with scikit-learn</li>
+<li>Applying DBSCAN to Predict Outliers/Anomalies</li>
+<li>Gaussian Mixture Models for Anomaly Detection</li>
+</ul>
+<section id="generating-synthetic-data-with-scikit-learn" class="level2">
+<h2 class="anchored" data-anchor-id="generating-synthetic-data-with-scikit-learn">1. Generating Synthetic Data with Scikit-learn</h2>
+<p>Scikit-learn has built-in synthetic data generators that can be used for a variety of machine learning tasks. Two such generators are <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_blobs.html#sklearn.datasets.make_blobs">make_blobs</a> and <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_classification.html#sklearn.datasets.make_classification">make_classification</a> which can create multiclass datasets containing normally distributed clusters of points for each class. In this blog post, we will use the make_blobs generator as it allows greater control over the placement of cluster centers and the standard deviation of points within each cluster. Let us start be creating few clusters using make_blobs.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-01T13:11:34.782059200Z&quot;,&quot;start_time&quot;:&quot;2023-12-01T13:11:34.566244600Z&quot;}" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_blobs</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_blobs</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>X, y, centers <span class="op">=</span> make_blobs(n_samples<span class="op">=</span><span class="dv">1500</span>, </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                           centers<span class="op">=</span><span class="dv">4</span>, </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                           n_features<span class="op">=</span><span class="dv">2</span>, </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                           cluster_std<span class="op">=</span><span class="fl">1.8</span>, </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                           random_state<span class="op">=</span><span class="dv">5805</span>, </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                           return_centers<span class="op">=</span><span class="va">True</span>, </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>                           shuffle<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> StandardScaler()</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> scaler.fit_transform(X)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>centers_scaled <span class="op">=</span> scaler.transform(centers)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>plt.scatter(X[:, <span class="dv">0</span>], X[:, <span class="dv">1</span>], c<span class="op">=</span>y, cmap<span class="op">=</span><span class="st">'tab10'</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Four Randomly Generated Gaussian Spherical Blobs with $\sigma=1.8$"</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">4</span>):</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    plt.scatter(x<span class="op">=</span>centers_scaled[i][<span class="dv">0</span>], y<span class="op">=</span>centers_scaled[i][<span class="dv">1</span>], s<span class="op">=</span><span class="dv">100</span>, c<span class="op">=</span><span class="st">'black'</span>, marker<span class="op">=</span><span class="st">'o'</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    plt.scatter(x<span class="op">=</span>centers_scaled[i][<span class="dv">0</span>], y<span class="op">=</span>centers_scaled[i][<span class="dv">1</span>], s<span class="op">=</span><span class="dv">100</span>, c<span class="op">=</span><span class="st">'white'</span>, marker<span class="op">=</span><span class="st">'x'</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"The Centers of the clusters are at: </span><span class="ch">\n</span><span class="sc">{</span>centers_scaled<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-2-output-1.png" width="582" height="432"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The Centers of the clusters are at: 
+[[-0.42055743 -1.02171133]
+ [ 1.52980404 -0.75580787]
+ [-0.80809373  0.3622626 ]
+ [-0.29674727  1.43940821]]</code></pre>
+</div>
+</div>
+<p>The above code generated four clusters with the specified standard deviation. Internally make_blobs uses a generative model called the Gaussian Mixture Model(GMM), which is a statistical model that assumes instances (data points) to belong to a finite mixture of Gaussian (normal) distributions with some known parameters. Simply put, GMM is a way of representing dataset as a collection of Gaussian distributions. Each of these distributions represent a cluster of data points, just like the ones shown above. Later in this blog, we will see how to use GMM to detect outliers/anomalies in our data.</p>
+<section id="linear-transformations" class="level3">
+<h3 class="anchored" data-anchor-id="linear-transformations">Linear Transformations</h3>
+<p>Another useful trick when generating synthetic data is applying linear transformations. Sometimes, we want to make the clusters elliptical rather than circular, or bring the clusters closer to evaluate the performance of the algorithms we want to use. Linear transformations are a great way to do this. Below are the list of transformations and their corresponding matrix forms that are most commonly used -</p>
+<ol type="1">
+<li>Matrix for <strong>Horizontal shear</strong> <span class="math display">\[ \huge A=\begin{bmatrix}
+1 &amp;k \\
+0 &amp;1
+\end{bmatrix} \]</span></li>
+<li>Matrix for <strong>Vertical shear</strong> <span class="math display">\[ \huge A=\begin{bmatrix}
+1 &amp;0 \\
+k &amp;1
+\end{bmatrix} \]</span></li>
+<li>Matrix for <strong>Counterclockwise Rotation</strong> <span class="math display">\[ \huge A=\begin{bmatrix}
+\cos(\theta) &amp;-\sin(\theta) \\
+\sin(\theta) &amp;\cos(\theta)
+\end{bmatrix} \]</span></li>
+<li>Matrix for <strong>reflection</strong> about horizontal axis <span class="math display">\[ \huge A=\begin{bmatrix}
+1 &amp;0 \\
+0 &amp;-1
+\end{bmatrix} \]</span></li>
+</ol>
+<p>Let us apply these transformations on our synthetic data to see how the transformed data look.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-01T13:11:35.514326500Z&quot;,&quot;start_time&quot;:&quot;2023-12-01T13:11:34.785603100Z&quot;}" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ax1 <span class="op">=</span> fig.add_subplot(<span class="dv">221</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Rotation (Clockwise)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>angle45 <span class="op">=</span> <span class="dv">45</span> <span class="op">*</span> np.pi<span class="op">/</span><span class="dv">180</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>angle135 <span class="op">=</span> <span class="dv">135</span> <span class="op">*</span> np.pi<span class="op">/</span><span class="dv">180</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>rotation_transformation <span class="op">=</span> np.array([</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    [np.cos(angle45), np.sin(angle45)], </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    [np.cos(angle135), np.sin(angle135)]</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>X_rotated <span class="op">=</span> X.dot(rotation_transformation)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>ax1.scatter(X_rotated[:, <span class="dv">0</span>], X_rotated[:, <span class="dv">1</span>], c<span class="op">=</span>y, cmap<span class="op">=</span><span class="st">'tab10'</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>ax1.set_title(<span class="st">"Clockwise Rotation"</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># reflection - Horizontal Axis</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>ax2 <span class="op">=</span> fig.add_subplot(<span class="dv">222</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>reflection_matrix <span class="op">=</span> np.array([</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">1</span>, <span class="dv">0</span>], </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>X_transformed <span class="op">=</span> X.dot(reflection_matrix)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>ax2.scatter(X_transformed[:, <span class="dv">0</span>], X_transformed[:, <span class="dv">1</span>], c<span class="op">=</span>y, cmap<span class="op">=</span><span class="st">'tab10'</span>)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>ax2.set_title(<span class="st">"Rotation about Horizontal Axis"</span>)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Horizontal Shearing</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>ax3 <span class="op">=</span> fig.add_subplot(<span class="dv">223</span>)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>hshear_matrix <span class="op">=</span> np.array([</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">1</span>, <span class="fl">1.5</span>], </span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">0</span>, <span class="dv">1</span>]</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>X_hsheared <span class="op">=</span> X.dot(hshear_matrix)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>ax3.scatter(X_hsheared[:, <span class="dv">0</span>], X_hsheared[:, <span class="dv">1</span>], c<span class="op">=</span>y, cmap<span class="op">=</span><span class="st">'tab10'</span>)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>ax3.set_title(<span class="st">"Horizontal Shearing"</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Vertical Shearing</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>ax4 <span class="op">=</span> fig.add_subplot(<span class="dv">224</span>)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>vshear_matrix <span class="op">=</span> np.array([</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">1</span>, <span class="dv">0</span>], </span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">1.5</span>, <span class="dv">1</span>]</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>X_vsheared <span class="op">=</span> X.dot(vshear_matrix)</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>ax4.scatter(X_vsheared[:, <span class="dv">0</span>], X_vsheared[:, <span class="dv">1</span>], c<span class="op">=</span>y, cmap<span class="op">=</span><span class="st">'tab10'</span>)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>ax4.set_title(<span class="st">"Vertical Shearing"</span>)</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-3-output-1.png" width="805" height="801"></p>
+</div>
+</div>
+<p>You can pick and choose the transformation according to the type of problem you are simulating or the algorithm you are working with. Now that we have our data ready, let us go on a hunt for the outliers!</p>
+</section>
+</section>
+<section id="applying-dbscan-to-predict-outliersanomalies" class="level2">
+<h2 class="anchored" data-anchor-id="applying-dbscan-to-predict-outliersanomalies">2. Applying DBSCAN to Predict Outliers/Anomalies</h2>
+<p>The Density Based Spatial Clustering of Applications with Noise (DBSCAN) algorithm defines clusters as continuous regions of high density. The algorithm works by defining a neighborhood around each point in the dataset. A neighborhood is defined by two parameters: <strong><span class="math inline">\(\epsilon\)</span></strong> (<strong>epsilon</strong>) and <strong>min_samples</strong>. <span class="math inline">\(\epsilon\)</span> specifies a small distance (radius) around each instance and min_samples denote the minimum number of instances required to be in that instances <span class="math inline">\(\epsilon\)</span>-neighborhood for it to be considered a core instance. All instances in the neighborhood of a core instance belong to the same cluster and any instance that is not a core instance and does not have one in its neighborhood is considered an <strong>Anomaly</strong>.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-01T13:11:35.578999500Z&quot;,&quot;start_time&quot;:&quot;2023-12-01T13:11:35.516391600Z&quot;}" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> DBSCAN</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>dbscan <span class="op">=</span> DBSCAN(eps<span class="op">=</span><span class="fl">0.2</span>, min_samples<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>dbscan.fit(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<style>#sk-container-id-1 {color: black;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>DBSCAN(eps=0.2, min_samples=10)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" checked=""><label for="sk-estimator-id-1" class="sk-toggleable__label sk-toggleable__label-arrow">DBSCAN</label><div class="sk-toggleable__content"><pre>DBSCAN(eps=0.2, min_samples=10)</pre></div></div></div></div></div>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-01T13:11:35.761344800Z&quot;,&quot;start_time&quot;:&quot;2023-12-01T13:11:35.548444800Z&quot;}" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> dbscan.labels_</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>n_clusters_ <span class="op">=</span> <span class="bu">len</span>(<span class="bu">set</span>(labels)) <span class="op">-</span> (<span class="dv">1</span> <span class="cf">if</span> <span class="op">-</span><span class="dv">1</span> <span class="kw">in</span> labels <span class="cf">else</span> <span class="dv">0</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>unique_labels <span class="op">=</span> <span class="bu">set</span>(labels)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>core_samples_mask <span class="op">=</span> np.zeros_like(labels, dtype<span class="op">=</span><span class="bu">bool</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>core_samples_mask[dbscan.core_sample_indices_] <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [plt.cm.Spectral(each) <span class="cf">for</span> each <span class="kw">in</span> np.linspace(<span class="dv">0</span>, <span class="dv">1</span>, <span class="bu">len</span>(unique_labels))]</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k, col <span class="kw">in</span> <span class="bu">zip</span>(unique_labels, colors):</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> k <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>:</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Black used for noise.</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        col <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>]</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    class_member_mask <span class="op">=</span> labels <span class="op">==</span> k</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    xy <span class="op">=</span> X[class_member_mask <span class="op">&amp;</span> core_samples_mask]</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    plt.plot(</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        xy[:, <span class="dv">0</span>],</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        xy[:, <span class="dv">1</span>],</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"o"</span>,</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        markerfacecolor<span class="op">=</span><span class="bu">tuple</span>(col),</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        markeredgecolor<span class="op">=</span><span class="st">"k"</span>,</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>        markersize<span class="op">=</span><span class="dv">14</span>,</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    xy <span class="op">=</span> X[class_member_mask <span class="op">&amp;</span> <span class="op">~</span>core_samples_mask]</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    plt.plot(</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        xy[:, <span class="dv">0</span>],</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        xy[:, <span class="dv">1</span>],</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">"o"</span>,</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>        markerfacecolor<span class="op">=</span><span class="bu">tuple</span>(col),</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>        markeredgecolor<span class="op">=</span><span class="st">"k"</span>,</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>        markersize<span class="op">=</span><span class="dv">6</span>,</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f"Estimated number of clusters: </span><span class="sc">{</span>n_clusters_<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> silhouette_score, homogeneity_score</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"silhouette_score: </span><span class="sc">{</span>silhouette_score(X, labels)<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"homogeneity_score: </span><span class="sc">{</span>homogeneity_score(y, labels)<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-5-output-1.png" width="582" height="431"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>silhouette_score: 0.54
+homogeneity_score: 0.70</code></pre>
+</div>
+</div>
+<p>Looks like the DBSCAN algorithm could not make out all four clusters in our dataset. But yet it was able to spot many outliers. Let us validate our results with a more precise algorithm like Gaussian Mixture to help cluster the dataset accurately while also predict the outliers.</p>
+</section>
+<section id="gaussian-mixture-models-for-anomaly-detection" class="level2">
+<h2 class="anchored" data-anchor-id="gaussian-mixture-models-for-anomaly-detection">3. Gaussian Mixture Models for Anomaly Detection</h2>
+<p>We have seen how to use Gaussian Mixture Models to perform <a href="https://sai-sundeep.github.io/saisundeep.github.io/posts/Clustering/">clustering</a> tasks when data points are of varying sizes and densities. Another application of GMMs are in Anomaly and Novelty detection. Because they make use of normal distributions and probability densities. We can identify the points with low probability density and label them as anomalies. However, here again choosing the right number of gaussian clusters for the GMM model is essential, incorrectly choosing the number of components can cause the model to either under-fit or over-fit.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-01T13:11:35.899623400Z&quot;,&quot;start_time&quot;:&quot;2023-12-01T13:11:35.761184500Z&quot;}" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.mixture <span class="im">import</span> GaussianMixture</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>gm <span class="op">=</span> GaussianMixture(n_components<span class="op">=</span><span class="dv">4</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>gm.fit(X)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"cluster centers predicted by Gaussian Mixture Model: </span><span class="ch">\n</span><span class="ss"> </span><span class="sc">{</span>gm<span class="sc">.</span>means_<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Actual Centers: </span><span class="ch">\n</span><span class="ss"> </span><span class="sc">{</span>centers_scaled<span class="sc">}</span><span class="ss">"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>cluster centers predicted by Gaussian Mixture Model: 
+ [[-0.28867979  1.42304583]
+ [-0.82158344  0.35570973]
+ [-0.39582404 -1.00586282]
+ [ 1.53680021 -0.76325421]]
+
+Actual Centers: 
+ [[-0.42055743 -1.02171133]
+ [ 1.52980404 -0.75580787]
+ [-0.80809373  0.3622626 ]
+ [-0.29674727  1.43940821]]</code></pre>
+</div>
+</div>
+<p>As you can see the centers predicted by the GaussianMixture model is pretty close to the actual centers from or generated data. Also note that unlike DBSCAN, the GaussianMixture was able to correctly predict four clusters in our dataset. Let us label and plot these anomalies.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-01T13:11:36.152409200Z&quot;,&quot;start_time&quot;:&quot;2023-12-01T13:11:35.899623400Z&quot;}" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>densities <span class="op">=</span> gm.score_samples(X)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>density_threshold <span class="op">=</span> np.percentile(densities, <span class="dv">2</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>cluster_points <span class="op">=</span> X[densities <span class="op">&gt;=</span> density_threshold]</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>anomalies <span class="op">=</span> X[densities <span class="op">&lt;</span> density_threshold]</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>y_labels <span class="op">=</span> gm.fit_predict(cluster_points)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>plt.scatter(cluster_points[:, <span class="dv">0</span>], cluster_points[:, <span class="dv">1</span>], c<span class="op">=</span>y_labels, cmap<span class="op">=</span><span class="st">'tab10'</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>plt.scatter(anomalies[:, <span class="dv">0</span>], anomalies[:, <span class="dv">1</span>], c<span class="op">=</span><span class="st">'black'</span>, marker<span class="op">=</span><span class="st">'*'</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Anomalies Detected by GaussianMixture Model"</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-7-output-1.png" width="582" height="431"></p>
+</div>
+</div>
+</section>
+<section id="conclusion-closing-remarks" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion-closing-remarks">Conclusion &amp; Closing Remarks</h2>
+<p>DBSCAN and Gaussian Mixture Models are powerful unsupervised learning algorithms for clustering and anomaly detection tasks. Each has its own strengths and weaknesses, and choosing the right one depends on the data and problem being tackled. GMMs are particularly good at dealing with complex data distributions, over-lapping and non-spherical clusters. They can also be used for soft clustering to assign multiple probabilities to each point. DBSCAN, on the other hand, is less affected by data noise and can identify clusters with arbitrary shapes. It is, therefore, important to choose the best algorithm that suits the data and problem at hand.</p>
+<p>We also saw how to generate synthetic data using scikit_learn in this blog post. Working with such datasets is both cost-effective and hugely beneficial when specific needs or conditions are not met by the real world data or when privacy concerns limit the data availability. Synthetic datasets are scalable and can help simulate ‘what if’ scenarios, test a hypothesis or model multiple outcomes.</p>
 
 
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
