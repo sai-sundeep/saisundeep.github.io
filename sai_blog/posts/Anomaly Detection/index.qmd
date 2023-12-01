@@ -1,9 +1,234 @@
 ---
-title: "Anomaly Detection"
+title: "Anomaly Detection and Synthetic Data Generation with Scikit-Learn"
 author: "Sai Sundeep Rayidi"
-date: "2023-10-19"
-categories: [anomaly detection, news, code, analysis]
+date: "2023-12-01"
+categories: [Anomaly Detection, DBSCAN, Synthetic Data]
 image: "anomaly.jpg"
+jupyter: python3
 ---
 
-This is a post with executable code about Anomaly Detection using Machine Learning Algorithms.
+Until now, we have worked with real world datasets and applied several Machine Learning algorithms to them. Sometimes it is also useful to generate synthetic data that closely simulates some real-world examples. In this blogpost, we will see how to generate synthetic data with scikit-learn. Specifically, we will create clusters of data with some anomalies which helps us to learn and apply some Anomaly Detection algorithms. At a high level, we will -
+
+* Generating Synthetic data with scikit-learn
+* Applying DBSCAN to Predict Outliers/Anomalies
+* Gaussian Mixture Models for Anomaly Detection
+
+
+## 1. Generating Synthetic Data with Scikit-learn
+ 
+Scikit-learn has built-in synthetic data generators that can be used for a variety of machine learning tasks. Two such generators are [make_blobs](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_blobs.html#sklearn.datasets.make_blobs) and [make_classification](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_classification.html#sklearn.datasets.make_classification) which can create multiclass datasets containing normally distributed clusters of points for each class. In this blog post, we will use the make_blobs generator as it allows greater control over the placement of cluster centers and the standard deviation of points within each cluster. Let us start be creating few clusters using make_blobs.
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-01T13:11:34.782059200Z', start_time: '2023-12-01T13:11:34.566244600Z'}
+import numpy as np
+from sklearn.datasets import make_blobs
+
+from sklearn.datasets import make_blobs
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+
+X, y, centers = make_blobs(n_samples=1500, 
+                           centers=4, 
+                           n_features=2, 
+                           cluster_std=1.8, 
+                           random_state=5805, 
+                           return_centers=True, 
+                           shuffle=True)
+
+scaler = StandardScaler()
+X = scaler.fit_transform(X)
+centers_scaled = scaler.transform(centers)
+plt.scatter(X[:, 0], X[:, 1], c=y, cmap='tab10')
+plt.title("Four Randomly Generated Gaussian Spherical Blobs with $\sigma=1.8$")
+for i in range(4):
+    plt.scatter(x=centers_scaled[i][0], y=centers_scaled[i][1], s=100, c='black', marker='o')
+    plt.scatter(x=centers_scaled[i][0], y=centers_scaled[i][1], s=100, c='white', marker='x')
+plt.show()
+
+print(f"The Centers of the clusters are at: \n{centers_scaled}")
+```
+
+The above code generated four clusters with the specified standard deviation. Internally make_blobs uses a generative model called the Gaussian Mixture Model(GMM), which is a statistical model that assumes instances (data points) to belong to a finite mixture of Gaussian (normal) distributions with some known parameters. Simply put, GMM is a way of representing dataset as a collection of Gaussian distributions. Each of these distributions represent a cluster of data points, just like the ones shown above. Later in this blog, we will see how to use GMM to detect outliers/anomalies in our data.
+
+### Linear Transformations
+
+Another useful trick when generating synthetic data is applying linear transformations. Sometimes, we want to make the clusters elliptical rather than circular, or bring the clusters closer to evaluate the performance of the algorithms we want to use. Linear transformations are a great way to do this. Below are the list of transformations and their corresponding matrix forms that are most commonly used -
+
+1. Matrix for **Horizontal shear** 
+$$ \huge A=\begin{bmatrix}
+    1 &k \\
+    0 &1
+\end{bmatrix} $$
+2. Matrix for **Vertical shear**
+$$ \huge A=\begin{bmatrix}
+    1 &0 \\
+    k &1
+\end{bmatrix} $$
+3. Matrix for **Counterclockwise Rotation**
+$$ \huge A=\begin{bmatrix}
+    \cos(\theta) &-\sin(\theta) \\
+    \sin(\theta) &\cos(\theta)
+\end{bmatrix} $$
+4. Matrix for **reflection** about horizontal axis
+$$ \huge A=\begin{bmatrix}
+    1 &0 \\
+    0 &-1
+\end{bmatrix} $$ 
+
+Let us apply these transformations on our synthetic data to see how the transformed data look.
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-01T13:11:35.514326500Z', start_time: '2023-12-01T13:11:34.785603100Z'}
+fig = plt.figure(figsize=(10, 10))
+ax1 = fig.add_subplot(221)
+
+# Rotation (Clockwise)
+angle45 = 45 * np.pi/180
+angle135 = 135 * np.pi/180
+rotation_transformation = np.array([
+    [np.cos(angle45), np.sin(angle45)], 
+    [np.cos(angle135), np.sin(angle135)]
+])
+
+X_rotated = X.dot(rotation_transformation)
+ax1.scatter(X_rotated[:, 0], X_rotated[:, 1], c=y, cmap='tab10')
+ax1.set_title("Clockwise Rotation")
+
+
+# reflection - Horizontal Axis
+ax2 = fig.add_subplot(222)
+reflection_matrix = np.array([
+    [1, 0], 
+    [0, -1]
+])
+X_transformed = X.dot(reflection_matrix)
+ax2.scatter(X_transformed[:, 0], X_transformed[:, 1], c=y, cmap='tab10')
+ax2.set_title("Rotation about Horizontal Axis")
+
+# Horizontal Shearing
+ax3 = fig.add_subplot(223)
+hshear_matrix = np.array([
+    [1, 1.5], 
+    [0, 1]
+])
+X_hsheared = X.dot(hshear_matrix)
+ax3.scatter(X_hsheared[:, 0], X_hsheared[:, 1], c=y, cmap='tab10')
+ax3.set_title("Horizontal Shearing")
+
+# Vertical Shearing
+ax4 = fig.add_subplot(224)
+vshear_matrix = np.array([
+    [1, 0], 
+    [1.5, 1]
+])
+X_vsheared = X.dot(vshear_matrix)
+ax4.scatter(X_vsheared[:, 0], X_vsheared[:, 1], c=y, cmap='tab10')
+ax4.set_title("Vertical Shearing")
+plt.show()
+```
+
+You can pick and choose the transformation according to the type of problem you are simulating or the algorithm you are working with. Now that we have our data ready, let us go on a hunt for the outliers!
+
+## 2. Applying DBSCAN to Predict Outliers/Anomalies
+
+The Density Based Spatial Clustering of Applications with Noise (DBSCAN) algorithm defines clusters as continuous regions of high density. The algorithm works by defining a neighborhood around each point in the dataset. A neighborhood is defined by two parameters: **$\epsilon$** (**epsilon**) and **min_samples**. $\epsilon$ specifies a small distance (radius) around each instance and min_samples denote the minimum number of instances required to be in that instances $\epsilon$-neighborhood for it to be considered a core instance. All instances in the neighborhood of a core instance belong to the same cluster and any instance that is not a core instance and does not have one in its neighborhood is considered an **Anomaly**.
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-01T13:11:35.578999500Z', start_time: '2023-12-01T13:11:35.516391600Z'}
+from sklearn.cluster import DBSCAN
+
+dbscan = DBSCAN(eps=0.2, min_samples=10)
+dbscan.fit(X)
+```
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-01T13:11:35.761344800Z', start_time: '2023-12-01T13:11:35.548444800Z'}
+labels = dbscan.labels_
+n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+unique_labels = set(labels)
+core_samples_mask = np.zeros_like(labels, dtype=bool)
+core_samples_mask[dbscan.core_sample_indices_] = True
+
+colors = [plt.cm.Spectral(each) for each in np.linspace(0, 1, len(unique_labels))]
+for k, col in zip(unique_labels, colors):
+    if k == -1:
+        # Black used for noise.
+        col = [0, 0, 0, 1]
+
+    class_member_mask = labels == k
+
+    xy = X[class_member_mask & core_samples_mask]
+    plt.plot(
+        xy[:, 0],
+        xy[:, 1],
+        "o",
+        markerfacecolor=tuple(col),
+        markeredgecolor="k",
+        markersize=14,
+    )
+
+    xy = X[class_member_mask & ~core_samples_mask]
+    plt.plot(
+        xy[:, 0],
+        xy[:, 1],
+        "o",
+        markerfacecolor=tuple(col),
+        markeredgecolor="k",
+        markersize=6,
+    )
+
+plt.title(f"Estimated number of clusters: {n_clusters_}")
+plt.show()
+
+from sklearn.metrics import silhouette_score, homogeneity_score
+print(f"silhouette_score: {silhouette_score(X, labels):.2f}")
+print(f"homogeneity_score: {homogeneity_score(y, labels):.2f}")
+```
+
+Looks like the DBSCAN algorithm could not make out all four clusters in our dataset. But yet it was able to spot many outliers. Let us validate our results with a more precise algorithm like Gaussian Mixture to help cluster the dataset accurately while also predict the outliers. 
+
+## 3. Gaussian Mixture Models for Anomaly Detection
+
+We have seen how to use Gaussian Mixture Models to perform [clustering](https://sai-sundeep.github.io/saisundeep.github.io/posts/Clustering/) tasks when data points are of varying sizes and densities. Another application of GMMs are in Anomaly and Novelty detection. Because they make use of normal distributions and probability densities. We can identify the points with low probability density and label them as anomalies. However, here again choosing the right number of gaussian clusters for the GMM model is essential, incorrectly choosing the number of components can cause the model to either under-fit or over-fit.    
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-01T13:11:35.899623400Z', start_time: '2023-12-01T13:11:35.761184500Z'}
+from sklearn.mixture import GaussianMixture
+
+gm = GaussianMixture(n_components=4, n_init=10)
+gm.fit(X)
+print(f"cluster centers predicted by Gaussian Mixture Model: \n {gm.means_}\n")
+print(f"Actual Centers: \n {centers_scaled}") 
+```
+
+As you can see the centers predicted by the GaussianMixture model is pretty close to the actual centers from or generated data. Also note that unlike DBSCAN, the GaussianMixture was able to correctly predict four clusters in our dataset. Let us label and plot these anomalies.
+
+```{python}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-01T13:11:36.152409200Z', start_time: '2023-12-01T13:11:35.899623400Z'}
+import seaborn as sns
+densities = gm.score_samples(X)
+density_threshold = np.percentile(densities, 2)
+cluster_points = X[densities >= density_threshold]
+anomalies = X[densities < density_threshold]
+
+y_labels = gm.fit_predict(cluster_points)
+
+plt.scatter(cluster_points[:, 0], cluster_points[:, 1], c=y_labels, cmap='tab10')
+plt.scatter(anomalies[:, 0], anomalies[:, 1], c='black', marker='*')
+plt.title("Anomalies Detected by GaussianMixture Model")
+plt.show()
+```
+
+## Conclusion & Closing Remarks
+
+DBSCAN and Gaussian Mixture Models are powerful unsupervised learning algorithms for clustering and anomaly detection tasks. Each has its own strengths and weaknesses, and choosing the right one depends on the data and problem being tackled. GMMs are particularly good at dealing with complex data distributions, over-lapping and non-spherical clusters. They can also be used for soft clustering to assign multiple probabilities to each point. DBSCAN, on the other hand, is less affected by data noise and can identify clusters with arbitrary shapes. It is, therefore, important to choose the best algorithm that suits the data and problem at hand. 
+
+We also saw how to generate synthetic data using scikit_learn in this blog post. Working with such datasets is both cost-effective and hugely beneficial when specific needs or conditions are not met by the real world data or when privacy concerns limit the data availability. Synthetic datasets are scalable and can help simulate ‘what if’ scenarios, test a hypothesis or model multiple outcomes.
+
+
