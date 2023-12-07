@@ -70,12 +70,13 @@ A variable that is normally distributed has a histogram (or "density function") 
 def iris_histogram_plotter(df):
     features_list = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
     counter = 0
-    fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(16, 15))
+    fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(8, 8))
     for i in range(2):
         for j in range(2):
             sns.histplot(df, x=features_list[counter], kde=True, ax=axs[i][j])
             axs[i][j].set_title(f"Distribution of \"{features_list[counter]}\" Feature")
             counter += 1
+    plt.tight_layout()
     plt.show()
 
 iris_histogram_plotter(df=iris)
@@ -96,7 +97,7 @@ Although somewhat unreliable and does not always guarantee that the distribution
 from statsmodels.graphics.gofplots import qqplot
 
 features_list = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
-fig = plt.figure(figsize=(10, 10))
+fig = plt.figure(figsize=(8, 8))
 ax1 = fig.add_subplot(221)
 qqplot(iris['sepal_length'], line='s', ax=ax1)
 ax1.set_title("QQ-plot - Normality Test for \"sepal_length\" feature")
@@ -236,5 +237,4 @@ sd = np.std(iris_scaled_df['sepal_length'].round(2))
 print(f"Sepal Length Mean after Z-Score Transformation : {mean:.2f} ")
 print(f"Sepal Length Standard Deviation after Z-Score Transformation : {sd:.2f}")
 ```
-
 
