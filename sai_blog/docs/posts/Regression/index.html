@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Sai Sundeep Rayidi">
-<meta name="dcterms.date" content="2023-10-13">
+<meta name="dcterms.date" content="2023-12-05">
 
 <title>Sai’s ML blog - Linear and Non-Linear Regression</title>
 <style>
@@ -101,11 +101,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <link rel="stylesheet" href="../../styles.css">
 <meta property="og:title" content="Sai’s ML blog - Linear and Non-Linear Regression">
-<meta property="og:description" content="">
-<meta property="og:image" content="https://sai-sundeep.github.io/saisundeep.github.io/posts/Regression/index_files/figure-html/cell-4-output-1.png">
+<meta property="og:image" content="index_files/figure-html/cell-4-output-1.png">
 <meta property="og:site-name" content="Sai's ML blog">
-<meta property="og:image:height" content="909">
-<meta property="og:image:width" content="1210">
 </head>
 
 <body class="nav-fixed fullcontent">
@@ -186,7 +183,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">October 13, 2023</p>
+        <p class="date">December 5, 2023</p>
       </div>
     </div>
     
@@ -204,7 +201,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p>This is a post on regression analysis on diamonds dataset.</p>
 <div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T16:32:07.748105900Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T16:32:07.732195300Z&quot;}" data-execution_count="1">
 <details>
 <summary>Code</summary>
@@ -492,12 +488,12 @@ Name: price, dtype: float64</code></pre>
 +----------------+-------+-------+-------+-------+-------+-------+------+
 | Feature(↓)/(→) | carat | depth | table | price |   x   |   y   |  z   |
 +----------------+-------+-------+-------+-------+-------+-------+------+
-|     carat      |  1.0  | -0.18 |  0.12 |  0.65 |  0.77 |  0.49 | 0.79 |
-|     depth      | -0.18 |  1.0  | -0.32 | -0.17 | -0.48 | -0.37 | 0.19 |
-|     table      |  0.12 | -0.32 |  1.0  |  0.0  |  0.23 |  0.12 | 0.08 |
-|     price      |  0.65 | -0.17 |  0.0  |  1.0  |  0.37 |  0.33 | 0.86 |
-|       x        |  0.77 | -0.48 |  0.23 |  0.37 |  1.0  |  0.64 | 0.88 |
-|       y        |  0.49 | -0.37 |  0.12 |  0.33 |  0.64 |  1.0  | 0.8  |
+|     carat      |  1.0  |  0.1  |  0.16 |  0.92 |  0.92 |  0.77 | 0.79 |
+|     depth      |  0.1  |  1.0  |  -0.3 |  0.03 | -0.04 | -0.04 | 0.19 |
+|     table      |  0.16 |  -0.3 |  1.0  |  0.13 |  0.18 |  0.14 | 0.08 |
+|     price      |  0.92 |  0.03 |  0.13 |  1.0  |  0.88 |  0.87 | 0.86 |
+|       x        |  0.92 | -0.04 |  0.18 |  0.88 |  1.0  |  0.87 | 0.88 |
+|       y        |  0.77 | -0.04 |  0.14 |  0.87 |  0.87 |  1.0  | 0.8  |
 |       z        |  0.79 |  0.19 |  0.08 |  0.86 |  0.88 |  0.8  | 1.0  |
 +----------------+-------+-------+-------+-------+-------+-------+------+</code></pre>
 </div>
@@ -522,60 +518,60 @@ Name: price, dtype: float64</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">carat</td>
 <td>1.0</td>
-<td>-0.18</td>
-<td>0.12</td>
-<td>0.65</td>
+<td>0.1</td>
+<td>0.16</td>
+<td>0.92</td>
+<td>0.92</td>
 <td>0.77</td>
-<td>0.49</td>
 <td>0.79</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">depth</td>
-<td>-0.18</td>
+<td>0.1</td>
 <td>1.0</td>
-<td>-0.32</td>
-<td>-0.17</td>
-<td>-0.48</td>
-<td>-0.37</td>
+<td>-0.3</td>
+<td>0.03</td>
+<td>-0.04</td>
+<td>-0.04</td>
 <td>0.19</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">table</td>
-<td>0.12</td>
-<td>-0.32</td>
+<td>0.16</td>
+<td>-0.3</td>
 <td>1.0</td>
-<td>0.0</td>
-<td>0.23</td>
-<td>0.12</td>
+<td>0.13</td>
+<td>0.18</td>
+<td>0.14</td>
 <td>0.08</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">price</td>
-<td>0.65</td>
-<td>-0.17</td>
-<td>0.0</td>
+<td>0.92</td>
+<td>0.03</td>
+<td>0.13</td>
 <td>1.0</td>
-<td>0.37</td>
-<td>0.33</td>
+<td>0.88</td>
+<td>0.87</td>
 <td>0.86</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">x</td>
-<td>0.77</td>
-<td>-0.48</td>
-<td>0.23</td>
-<td>0.37</td>
+<td>0.92</td>
+<td>-0.04</td>
+<td>0.18</td>
+<td>0.88</td>
 <td>1.0</td>
-<td>0.64</td>
+<td>0.87</td>
 <td>0.88</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">y</td>
-<td>0.49</td>
-<td>-0.37</td>
-<td>0.12</td>
-<td>0.33</td>
-<td>0.64</td>
+<td>0.77</td>
+<td>-0.04</td>
+<td>0.14</td>
+<td>0.87</td>
+<td>0.87</td>
 <td>1.0</td>
 <td>0.8</td>
 </tr>
@@ -1046,13 +1042,13 @@ Name: price, dtype: float64</code></pre>
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>lin_reg[<span class="op">-</span><span class="dv">1</span>].coef_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="32">
-<pre><code>array([-1.15234906e+03,  7.85197082e+01, -3.65504992e+01,  5.26242057e+03,
-       -8.91507968e+01, -5.30774984e+01, -1.06221052e+15, -1.06221052e+15,
-       -1.06221052e+15, -1.06221052e+15, -1.06221052e+15, -5.55119485e+14,
-       -5.55119485e+14, -5.55119485e+14, -5.55119485e+14, -5.55119485e+14,
-       -5.55119485e+14, -5.55119485e+14, -3.60092931e+15, -3.60092931e+15,
-       -3.60092931e+15, -3.60092931e+15, -3.60092931e+15, -3.60092931e+15,
-       -3.60092931e+15, -3.60092931e+15])</code></pre>
+<pre><code>array([-1.09218051e+03,  1.23039248e+00, -4.85574021e+01,  5.30834709e+03,
+       -9.31443879e+01, -5.37068014e+01, -1.68143465e+15, -1.68143465e+15,
+       -1.68143465e+15, -1.68143465e+15, -1.68143465e+15,  1.05325052e+14,
+        1.05325052e+14,  1.05325052e+14,  1.05325052e+14,  1.05325052e+14,
+        1.05325052e+14,  1.05325052e+14, -2.44531644e+14, -2.44531644e+14,
+       -2.44531644e+14, -2.44531644e+14, -2.44531644e+14, -2.44531644e+14,
+       -2.44531644e+14, -2.44531644e+14])</code></pre>
 </div>
 </div>
 <div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-27T04:39:10.101743800Z&quot;,&quot;start_time&quot;:&quot;2023-10-27T04:39:10.073130800Z&quot;}" data-execution_count="33">
@@ -1064,7 +1060,7 @@ Name: price, dtype: float64</code></pre>
 <span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficient of Determination: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> r2_score(diamonds_price_test, diamonds_price_predictor))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Mean Squared Error: 1261730.78
+<pre><code>Mean Squared Error: 1322700.06
 Coefficient of Determination: 0.92</code></pre>
 </div>
 </div>
@@ -1134,7 +1130,7 @@ Coefficient of Determination: 0.92</code></pre>
 <span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficient of Determination: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> r2_score(diamonds_price_test, price_predictor_sgd))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Mean Squared Error: 1263241.49
+<pre><code>Mean Squared Error: 1327264.91
 Coefficient of Determination: 0.92</code></pre>
 </div>
 </div>
@@ -1200,7 +1196,7 @@ Coefficient of Determination: 0.92</code></pre>
 <span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficient of Determination: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> r2_score(diamonds_price_test, price_predictor_rfr))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Mean Squared Error: 317507.25
+<pre><code>Mean Squared Error: 309713.47
 Coefficient of Determination: 0.98</code></pre>
 </div>
 </div>

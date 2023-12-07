@@ -1,7 +1,7 @@
 ---
 title: "Linear and Non-Linear Regression"
 author: "Sai Sundeep Rayidi"
-date: "2023-10-13"
+date: "2023-12-05"
 categories: [regression, news, code, analysis, polynomial regression]
 jupyter: python3
 format:
