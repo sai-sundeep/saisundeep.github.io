@@ -9,11 +9,11 @@ about:
       href: https://www.linkedin.com/in/sai-sundeep-rayidi-7256b4245/
     - icon: github
       text: Github
-      href: https://github.com/sai-sundeep/sai-sundeep
+      href: https://github.com/sai-sundeep/saisundeep.github.io/tree/main
 
 ---
 
-Hi, I am Sai, a Computer Science graduate student at Virginia Tech. I blog about Data Analytics, Visualization and Machine Learning. When not innovating on these topics, I enjoy reading, prepping for a half-marathon, and playing cricket.
+Hi, I am Sai, a Computer Science graduate student at Virginia Tech. I blog about Data Analytics, Visualization and Machine Learning. When not innovating on these topics, I enjoy reading, running, cooking, and playing cricket.
 
 
 ## Education
