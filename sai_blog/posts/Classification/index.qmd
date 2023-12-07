@@ -2,7 +2,7 @@
 title: "Multiclass Classification on Fashion MNIST Dataset"
 author: "Sai Sundeep Rayidi"
 date: "2023-11-18"
-categories: [classification, precision, recall, f1-score, code, PCA analysis, Confusion Matrix, RandomizedSearch, visualization, Multi-Class]
+categories: [classification, PCA analysis, Classification Performance, RandomizedSearch, Multi-Class]
 jupyter: python3
 ---
 
