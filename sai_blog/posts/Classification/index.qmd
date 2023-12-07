@@ -6,24 +6,24 @@ categories: [classification, precision, recall, f1-score, code, PCA analysis, Co
 jupyter: python3
 ---
 
-In this blog we will be performing multiclass classification on the [Fashion MNIST dataset](https://en.wikipedia.org/wiki/Fashion_MNIST). The dataset contains 60,000 images for training and 10,000 images for validation of 10 different types of fashion products. Multiclass classification is a classification task with more than two classes. Each sample can only be labeled as one class. For example, in the context of fashion-mnist images, each image can be of either a shirt, a sneaker, or a trouser. Each image is one sample and is labeled as one of the 10 possible classes. Multiclass classification makes the assumption that each sample is assigned to one and only one label - one sample cannot, for example, be both a shirt and a coat.
 
+In this blog we will be performing multiclass classification on the [Fashion MNIST dataset](https://en.wikipedia.org/wiki/Fashion_MNIST). The dataset contains 60,000 images for training and 10,000 images for validation of 10 different types of fashion products. Multiclass classification is a classification task with more than two classes. Each sample can only be labeled as one class. For example, in the context of fashion-mnist images, each image can be of either a shirt, a sneaker, or a trouser. Each image is one sample and is labeled as one of the 10 possible classes. Multiclass classification makes the assumption that each sample is assigned to one and only one label - one sample cannot, for example, be both a shirt and a coat. We will be performing the following tasks in this blog -
 
-We will be performing the following tasks in this blog - 
-* Import, analyze, and visualize the fashion-mnist dataset.
-* Prepare the data for classification 
-    + Principal Component Analysis 
-    + Hyperparameter Tuning with Randomized Search
-* Train a RandomForestClassifier and visualize its performance metrics
-* Observations and Conclusion
+1. Import, analyze, and visualize the fashion-mnist dataset.
+2. Prepare the data for classification 
+    * Principal Component Analysis 
+    * Hyperparameter Tuning with Randomized Search
+3. Train a RandomForestClassifier and visualize its performance metrics
+4. Observations and Conclusion
 
 Let us begin by importing a few packages and loading the data into a pandas dataframe. 
+
 
 ### 1. Import, analyze, and visualize the fashion-mnist dataset.
 
 ```{python}
 #| collapsed: false
-#| ExecuteTime: {end_time: '2023-11-18T03:34:01.930845300Z', start_time: '2023-11-18T03:34:01.921269600Z'}
+#| ExecuteTime: {end_time: '2023-12-07T01:42:49.638487500Z', start_time: '2023-12-07T01:42:49.636855900Z'}
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -34,7 +34,7 @@ warnings.filterwarnings(category=UserWarning, action='ignore')
 
 ```{python}
 #| collapsed: false
-#| ExecuteTime: {end_time: '2023-11-18T03:34:03.831388700Z', start_time: '2023-11-18T03:34:01.930845300Z'}
+#| ExecuteTime: {end_time: '2023-12-07T01:42:58.730722100Z', start_time: '2023-12-07T01:42:56.245180100Z'}
 # Load the train and test datasets
 fmnist_train_df = pd.read_csv("fashion_mnist_train.csv")
 fmnist_test_df = pd.read_csv("fashion_mnist_test.csv")
@@ -42,7 +42,7 @@ fmnist_test_df = pd.read_csv("fashion_mnist_test.csv")
 
 ```{python}
 #| collapsed: false
-#| ExecuteTime: {end_time: '2023-11-18T03:34:03.837791800Z', start_time: '2023-11-18T03:34:03.835239200Z'}
+#| ExecuteTime: {end_time: '2023-12-07T01:43:07.861943300Z', start_time: '2023-12-07T01:43:07.830366600Z'}
 print(f'Train Set Dimensions - {fmnist_train_df.shape}')
 print(f'Test Set Dimensions - {fmnist_test_df.shape}')
 ```
@@ -51,7 +51,7 @@ Let us print a few records from the training set and see how the data looks like
 
 ```{python}
 #| collapsed: false
-#| ExecuteTime: {end_time: '2023-11-18T03:34:03.856649200Z', start_time: '2023-11-18T03:34:03.837791800Z'}
+#| ExecuteTime: {end_time: '2023-12-07T01:43:12.265067200Z', start_time: '2023-12-07T01:43:12.217779200Z'}
 fmnist_train_df.head(10)
 ```
 
@@ -59,12 +59,11 @@ We can see that most of the data is 0 with few values here and there. That is be
 
 ```{python}
 #| collapsed: false
-#| ExecuteTime: {end_time: '2023-11-18T03:34:11.103756500Z', start_time: '2023-11-18T03:34:03.856649200Z'}
-#| fig-width: 10
+#| ExecuteTime: {end_time: '2023-12-07T01:43:24.794678900Z', start_time: '2023-12-07T01:43:18.324921400Z'}
 # Visualize the Images in the Dataset
 labels_list = list(fmnist_train_df['label'].unique())
 labels_list.sort()
-fig, axs = plt.subplots(10, 10, figsize=(12, 12), layout='constrained')
+fig, axs = plt.subplots(10, 10, figsize=(8, 8), layout='constrained')
 for i in range(0, 10):
     class_df = fmnist_train_df[fmnist_train_df['label'] == labels_list[i]]
     for j in range(0, 10):
@@ -319,9 +318,10 @@ We can normalize the confusion matrix by dividing each value by the total number
 #| ExecuteTime: {end_time: '2023-11-18T03:59:13.797141700Z', start_time: '2023-11-18T03:59:13.480594700Z'}
 # Plot the normalized confused matrix.
 ConfusionMatrixDisplay.from_predictions(y_test, y_pred, normalize='true', values_format=".0%")
-plt.grid()
+plt.grid(False)
 plt.title("Normalized Confusion Matrix")
 plt.xticks(rotation=60)
+plt.grid(False)
 plt.show()
 ```
 
@@ -332,3 +332,5 @@ Looking at the classification report, ROC Curve, and confusion matrix, we can ma
 The precision for "coat", "shirt", "pullover", and "T-shirt/top" is very low. This tells us that the model is predicting many False Positives for these classes. This is because these four classes are closely resembling one another. The classifier is unable to tell apart confidently a "coat" from a "shirt" and is resulting in many false positives and low precision. One way to improve the model precision for these labels is to increase the number of samples so that model can learn the subtle differences to tell apart each of these classes.
 
 The recall for shirt is very low 57%. This tells that many images of shirt have been misclassified as belonging to a different class. Looking at the normalized confusin matrix, we can see that 18% of shirts have been misclassified as T-Shirt/Top, 11% of the shirts have been misclassified as pullover and 8% as Coats. We can see the same issue with images of pullover and coat, they have been misclassified as these other similar looking products. Other ways to improve the performance of our classification model is by doing searching for a better set of hyperparameters and re-training the model to improve its performance across all class labels.
+
+
