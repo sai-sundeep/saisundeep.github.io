@@ -6,7 +6,7 @@ categories: [Linear Regression, Non-Linear Regression]
 jupyter: python3
 format:
   html:
-    code-fold: true
+    code-fold: False
     code-summary: "Show the code"
 ---
 
