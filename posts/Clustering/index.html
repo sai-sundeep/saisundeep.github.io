@@ -136,7 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
         <li>
-    <a class="dropdown-item" href="https://github.com/sai-sundeep/sai-sundeep" rel="" target="">
+    <a class="dropdown-item" href="https://github.com/sai-sundeep/saisundeep.github.io/tree/main" rel="" target="">
  <span class="dropdown-text">Source Code</span></a>
   </li>  
         <li>
@@ -167,6 +167,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                 <div class="quarto-category">analysis</div>
                 <div class="quarto-category">visualization</div>
                 <div class="quarto-category">K-Means</div>
+                <div class="quarto-category">Gaussian Mixtures</div>
               </div>
                   </div>
   </div>
@@ -366,9 +367,9 @@ sex                                 0.0</code></pre>
 <span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Scatter plot of Reduced Data - PCA1 vs PCA3"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>The Cluster Centers are - 
-[[-1.58950101 -0.3000391  -0.2218791 ]
+[[-1.50185976 -0.21065706 -0.26162702]
  [ 2.01297608 -0.39402785 -0.03586763]
- [-0.39177408  1.02255234  0.3941968 ]]</code></pre>
+ [-0.33251925  1.103199    0.59917913]]</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code>Text(0.5, 1.0, 'Scatter plot of Reduced Data - PCA1 vs PCA3')</code></pre>
@@ -391,8 +392,8 @@ sex                                 0.0</code></pre>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Inertia: "</span>, kmeans.inertia_)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Score: "</span>, kmeans.score(penguins_reduced))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Inertia:  334.92198044554704
-Score:  -334.92198044554704</code></pre>
+<pre><code>Inertia:  336.133975360404
+Score:  -336.13397536040395</code></pre>
 </div>
 </div>
 <p>The scores does not look so good even with a good initialization of n_clusters=3. This has to do with <strong>Clusters of varying sizes and density.</strong> k-means has trouble clustering data where clusters are of varying sizes and density. To see the inertia of the model initialized with different values of k, we can make use of the <strong>elbow curve</strong> as shown below. As we can see, the kmeans algorithm gives better performance with k greater than 3 (lower inertia). Which as we know is not correct. So inertia is not always perfect measure of the models performance.</p>
@@ -420,7 +421,7 @@ Score:  -334.92198044554704</code></pre>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> silhouette_score</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>silhouette_score(penguins_reduced, kmeans.labels_)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
-<pre><code>0.47266490077361456</code></pre>
+<pre><code>0.4840867203220288</code></pre>
 </div>
 </div>
 <div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-29T15:32:01.884939800Z&quot;,&quot;start_time&quot;:&quot;2023-11-29T15:32:01.766276900Z&quot;}" data-execution_count="10">
@@ -764,7 +765,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/sai-sundeep/sai-sundeep">
+    <a class="nav-link" href="https://github.com/sai-sundeep/saisundeep.github.io/tree/main">
       <i class="bi bi-github" role="img">
 </i> 
     </a>
