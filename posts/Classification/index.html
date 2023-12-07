@@ -106,8 +106,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta property="og:description" content="">
 <meta property="og:image" content="https://sai-sundeep.github.io/saisundeep.github.io/posts/Classification/index_files/figure-html/cell-6-output-1.png">
 <meta property="og:site-name" content="Sai's ML blog">
-<meta property="og:image:height" content="2318">
-<meta property="og:image:width" content="2326">
+<meta property="og:image:height" content="1545">
+<meta property="og:image:width" content="1558">
 </head>
 
 <body class="nav-fixed fullcontent">
@@ -211,12 +211,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p>In this blog we will be performing multiclass classification on the <a href="https://en.wikipedia.org/wiki/Fashion_MNIST">Fashion MNIST dataset</a>. The dataset contains 60,000 images for training and 10,000 images for validation of 10 different types of fashion products. Multiclass classification is a classification task with more than two classes. Each sample can only be labeled as one class. For example, in the context of fashion-mnist images, each image can be of either a shirt, a sneaker, or a trouser. Each image is one sample and is labeled as one of the 10 possible classes. Multiclass classification makes the assumption that each sample is assigned to one and only one label - one sample cannot, for example, be both a shirt and a coat.</p>
-<p>We will be performing the following tasks in this blog - * Import, analyze, and visualize the fashion-mnist dataset. * Prepare the data for classification + Principal Component Analysis + Hyperparameter Tuning with Randomized Search * Train a RandomForestClassifier and visualize its performance metrics * Observations and Conclusion</p>
+<p>In this blog we will be performing multiclass classification on the <a href="https://en.wikipedia.org/wiki/Fashion_MNIST">Fashion MNIST dataset</a>. The dataset contains 60,000 images for training and 10,000 images for validation of 10 different types of fashion products. Multiclass classification is a classification task with more than two classes. Each sample can only be labeled as one class. For example, in the context of fashion-mnist images, each image can be of either a shirt, a sneaker, or a trouser. Each image is one sample and is labeled as one of the 10 possible classes. Multiclass classification makes the assumption that each sample is assigned to one and only one label - one sample cannot, for example, be both a shirt and a coat. We will be performing the following tasks in this blog -</p>
+<ol type="1">
+<li>Import, analyze, and visualize the fashion-mnist dataset.</li>
+<li>Prepare the data for classification
+<ul>
+<li>Principal Component Analysis</li>
+<li>Hyperparameter Tuning with Randomized Search</li>
+</ul></li>
+<li>Train a RandomForestClassifier and visualize its performance metrics</li>
+<li>Observations and Conclusion</li>
+</ol>
 <p>Let us begin by importing a few packages and loading the data into a pandas dataframe.</p>
 <section id="import-analyze-and-visualize-the-fashion-mnist-dataset." class="level3">
 <h3 class="anchored" data-anchor-id="import-analyze-and-visualize-the-fashion-mnist-dataset.">1. Import, analyze, and visualize the fashion-mnist dataset.</h3>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-18T03:34:01.930845300Z&quot;,&quot;start_time&quot;:&quot;2023-11-18T03:34:01.921269600Z&quot;}" data-execution_count="1">
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-07T01:42:49.638487500Z&quot;,&quot;start_time&quot;:&quot;2023-12-07T01:42:49.636855900Z&quot;}" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -224,12 +233,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(category<span class="op">=</span><span class="pp">UserWarning</span>, action<span class="op">=</span><span class="st">'ignore'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-18T03:34:03.831388700Z&quot;,&quot;start_time&quot;:&quot;2023-11-18T03:34:01.930845300Z&quot;}" data-execution_count="2">
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-07T01:42:58.730722100Z&quot;,&quot;start_time&quot;:&quot;2023-12-07T01:42:56.245180100Z&quot;}" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the train and test datasets</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>fmnist_train_df <span class="op">=</span> pd.read_csv(<span class="st">"fashion_mnist_train.csv"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>fmnist_test_df <span class="op">=</span> pd.read_csv(<span class="st">"fashion_mnist_test.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-18T03:34:03.837791800Z&quot;,&quot;start_time&quot;:&quot;2023-11-18T03:34:03.835239200Z&quot;}" data-execution_count="3">
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-07T01:43:07.861943300Z&quot;,&quot;start_time&quot;:&quot;2023-12-07T01:43:07.830366600Z&quot;}" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Train Set Dimensions - </span><span class="sc">{</span>fmnist_train_df<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">'</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Test Set Dimensions - </span><span class="sc">{</span>fmnist_test_df<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -238,9 +247,9 @@ Test Set Dimensions - (10000, 785)</code></pre>
 </div>
 </div>
 <p>Let us print a few records from the training set and see how the data looks like.</p>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-18T03:34:03.856649200Z&quot;,&quot;start_time&quot;:&quot;2023-11-18T03:34:03.837791800Z&quot;}" data-execution_count="4">
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-07T01:43:12.265067200Z&quot;,&quot;start_time&quot;:&quot;2023-12-07T01:43:12.217779200Z&quot;}" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fmnist_train_df.head(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+<div class="cell-output cell-output-display" data-execution_count="6">
 <div>
 
 
@@ -520,11 +529,11 @@ Test Set Dimensions - (10000, 785)</code></pre>
 </div>
 </div>
 <p>We can see that most of the data is 0 with few values here and there. That is because each row is a 28 * 28 pixel image flattened into an [784,] array. Each element con contain a value between 0 and 255. Furthermore, the target feature named as label is having values from 0 to 9. We will have to process this column a little bit, to make more sense in the context of fashion products that we need to predict. We will see how to do that in just a bit, but first, let us try to reshape the images into 28 * 28 and try to visualize them using the matplotlib subplots.</p>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-18T03:34:11.103756500Z&quot;,&quot;start_time&quot;:&quot;2023-11-18T03:34:03.856649200Z&quot;}" data-execution_count="5">
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-07T01:43:24.794678900Z&quot;,&quot;start_time&quot;:&quot;2023-12-07T01:43:18.324921400Z&quot;}" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize the Images in the Dataset</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>labels_list <span class="op">=</span> <span class="bu">list</span>(fmnist_train_df[<span class="st">'label'</span>].unique())</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>labels_list.sort()</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">10</span>, <span class="dv">10</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">12</span>), layout<span class="op">=</span><span class="st">'constrained'</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">10</span>, <span class="dv">10</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">8</span>), layout<span class="op">=</span><span class="st">'constrained'</span>)</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">10</span>):</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    class_df <span class="op">=</span> fmnist_train_df[fmnist_train_df[<span class="st">'label'</span>] <span class="op">==</span> labels_list[i]]</span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">10</span>):</span>
@@ -535,7 +544,7 @@ Test Set Dimensions - (10000, 785)</code></pre>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">False</span>)</span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-6-output-1.png" width="1163" height="1159"></p>
+<p><img src="index_files/figure-html/cell-6-output-1.png" width="779" height="773"></p>
 </div>
 </div>
 <p>We can see from the above plot different kinds of fashion products in the dataset. An obvious difficulty our multiclass classification algorith may face is the close resemblance of three different classes - class 0, class 2, and class 6. Fashion MNIST labels these classes as T-shirt/Top, Pullover, and Shirt respectively. To make target classes clear for us going forward, let us write a helper function that maps, the respective class number to its corresponding label.</p>
@@ -570,7 +579,7 @@ Test Set Dimensions - (10000, 785)</code></pre>
 <p>Let us visualize if these changes took effect in the label column by printing a few values.</p>
 <div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-18T03:34:11.118234900Z&quot;,&quot;start_time&quot;:&quot;2023-11-18T03:34:11.113138900Z&quot;}" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fmnist_train_df[<span class="st">'label'</span>].head(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="7">
+<div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>0       Pullover
 1     Ankle boot
 2          Shirt
@@ -677,7 +686,7 @@ Name: label, dtype: object</code></pre>
 <span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>randomized_search <span class="op">=</span> RandomizedSearchCV(preprocess_pipeline, params_distribution, n_iter<span class="op">=</span><span class="dv">10</span>, cv<span class="op">=</span><span class="dv">3</span>, random_state<span class="op">=</span><span class="dv">5805</span>)</span>
 <span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>randomized_search.fit(X_train[:<span class="dv">1000</span>], y_train[:<span class="dv">1000</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="12">
+<div class="cell-output cell-output-display" data-execution_count="14">
 <style>#sk-container-id-1 {color: black;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>RandomizedSearchCV(cv=3,
                    estimator=Pipeline(steps=[('pca', PCA(random_state=5805)),
                                              ('randomforestclassifier',
@@ -718,7 +727,7 @@ Name: label, dtype: object</code></pre>
 <p>We can then use the <strong>best_params_</strong> attribute from the model to see the parameters that give best results. Note that above I have performed the search on 1000 training instances. Fell free to try and train on more instances. As you can see below, the number of estimators (desision tree classifiers) required by RandomForestClassifier are 197 and number of features are 234.</p>
 <div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-18T03:42:55.101431400Z&quot;,&quot;start_time&quot;:&quot;2023-11-18T03:42:55.088174200Z&quot;}" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>randomized_search.best_params_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="13">
+<div class="cell-output cell-output-display" data-execution_count="15">
 <pre><code>{'randomforestclassifier__n_estimators': 197, 'pca__n_components': 234}</code></pre>
 </div>
 </div>
@@ -813,10 +822,11 @@ weighted avg       0.86      0.87      0.86     10000
 <div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-11-18T03:59:13.797141700Z&quot;,&quot;start_time&quot;:&quot;2023-11-18T03:59:13.480594700Z&quot;}" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the normalized confused matrix.</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>ConfusionMatrixDisplay.from_predictions(y_test, y_pred, normalize<span class="op">=</span><span class="st">'true'</span>, values_format<span class="op">=</span><span class="st">".0%"</span>)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>plt.grid()</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">False</span>)</span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Normalized Confusion Matrix"</span>)</span>
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>plt.xticks(rotation<span class="op">=</span><span class="dv">60</span>)</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">False</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <p><img src="index_files/figure-html/cell-19-output-1.png" width="563" height="505"></p>
 </div>
@@ -826,7 +836,7 @@ weighted avg       0.86      0.87      0.86     10000
 <h3 class="anchored" data-anchor-id="observations-and-conclusion">4. Observations and Conclusion</h3>
 <p>Looking at the classification report, ROC Curve, and confusion matrix, we can make following observations -</p>
 <p>The precision for “coat”, “shirt”, “pullover”, and “T-shirt/top” is very low. This tells us that the model is predicting many False Positives for these classes. This is because these four classes are closely resembling one another. The classifier is unable to tell apart confidently a “coat” from a “shirt” and is resulting in many false positives and low precision. One way to improve the model precision for these labels is to increase the number of samples so that model can learn the subtle differences to tell apart each of these classes.</p>
-<p>The recall for shirt is very low 57%. This tells that many images of shirt have been misclassified as belonging to a different class. Looking at the normalized confusin matrix, we can see that 18% of shirts have been misclassified as T-Shirt/Top, 11% of the shirts have been misclassified as pullover and 8% as Coats. We can see the same issue with images of pullover and coat, they have been misclassified as these other similar looking products.</p>
+<p>The recall for shirt is very low 57%. This tells that many images of shirt have been misclassified as belonging to a different class. Looking at the normalized confusin matrix, we can see that 18% of shirts have been misclassified as T-Shirt/Top, 11% of the shirts have been misclassified as pullover and 8% as Coats. We can see the same issue with images of pullover and coat, they have been misclassified as these other similar looking products. Other ways to improve the performance of our classification model is by doing searching for a better set of hyperparameters and re-training the model to improve its performance across all class labels.</p>
 
 
 </section>
