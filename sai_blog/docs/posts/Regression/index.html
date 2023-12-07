@@ -101,10 +101,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <link rel="stylesheet" href="../../styles.css">
 <meta property="og:title" content="Sai’s ML blog - Linear and Non-Linear Regression">
-<meta property="og:image" content="https://sai-sundeep.github.io/saisundeep.github.io/posts/Regression/index_files/figure-html/cell-4-output-1.png">
+<meta property="og:image" content="index_files/figure-html/cell-4-output-1.png">
 <meta property="og:site-name" content="Sai's ML blog">
-<meta property="og:image:height" content="909">
-<meta property="og:image:width" content="1210">
 </head>
 
 <body class="nav-fixed fullcontent">
@@ -136,7 +134,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
         <li>
-    <a class="dropdown-item" href="https://github.com/sai-sundeep/sai-sundeep" rel="" target="">
+    <a class="dropdown-item" href="https://github.com/sai-sundeep/saisundeep.github.io/tree/main" rel="" target="">
  <span class="dropdown-text">Source Code</span></a>
   </li>  
         <li>
@@ -163,11 +161,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div class="quarto-title column-body">
       <h1 class="title">Linear and Non-Linear Regression</h1>
                                 <div class="quarto-categories">
-                <div class="quarto-category">regression</div>
-                <div class="quarto-category">news</div>
-                <div class="quarto-category">code</div>
-                <div class="quarto-category">analysis</div>
-                <div class="quarto-category">polynomial regression</div>
+                <div class="quarto-category">Linear Regression</div>
+                <div class="quarto-category">Non-Linear Regression</div>
               </div>
                   </div>
   </div>
@@ -485,19 +480,19 @@ Name: price, dtype: float64</code></pre>
 <span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a>calc_partial_correlation()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>+-----------------------------------------------------------------------+
-|            Partial Correlation Matrix for the tute1 dataset           |
-+----------------+-------+-------+-------+-------+-------+-------+------+
-| Feature(↓)/(→) | carat | depth | table | price |   x   |   y   |  z   |
-+----------------+-------+-------+-------+-------+-------+-------+------+
-|     carat      |  1.0  |  0.1  |  0.16 |  0.92 |  0.92 |  0.77 | 0.79 |
-|     depth      |  0.1  |  1.0  |  -0.3 |  0.03 | -0.04 | -0.04 | 0.19 |
-|     table      |  0.16 |  -0.3 |  1.0  |  0.13 |  0.18 |  0.14 | 0.08 |
-|     price      |  0.92 |  0.03 |  0.13 |  1.0  |  0.88 |  0.87 | 0.86 |
-|       x        |  0.92 | -0.04 |  0.18 |  0.88 |  1.0  |  0.87 | 0.88 |
-|       y        |  0.77 | -0.04 |  0.14 |  0.87 |  0.87 |  1.0  | 0.8  |
-|       z        |  0.79 |  0.19 |  0.08 |  0.86 |  0.88 |  0.8  | 1.0  |
-+----------------+-------+-------+-------+-------+-------+-------+------+</code></pre>
+<pre><code>+------------------------------------------------------------------------+
+|            Partial Correlation Matrix for the tute1 dataset            |
++----------------+-------+-------+-------+-------+-------+-------+-------+
+| Feature(↓)/(→) | carat | depth | table | price |   x   |   y   |   z   |
++----------------+-------+-------+-------+-------+-------+-------+-------+
+|     carat      |  1.0  | -0.18 |  0.12 |  0.65 |  0.77 |  0.49 | -0.01 |
+|     depth      | -0.18 |  1.0  | -0.32 | -0.17 | -0.48 | -0.37 |  0.49 |
+|     table      |  0.12 | -0.32 |  1.0  |  0.0  |  0.23 |  0.12 | -0.18 |
+|     price      |  0.65 | -0.17 |  0.0  |  1.0  |  0.37 |  0.33 |  0.06 |
+|       x        |  0.77 | -0.48 |  0.23 |  0.37 |  1.0  |  0.64 |  0.97 |
+|       y        |  0.49 | -0.37 |  0.12 |  0.33 |  0.64 |  1.0  |  0.15 |
+|       z        | -0.01 |  0.49 | -0.18 |  0.06 |  0.97 |  0.15 |  1.0  |
++----------------+-------+-------+-------+-------+-------+-------+-------+</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="15">
 <div>
@@ -520,71 +515,71 @@ Name: price, dtype: float64</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">carat</td>
 <td>1.0</td>
-<td>0.1</td>
-<td>0.16</td>
-<td>0.92</td>
-<td>0.92</td>
+<td>-0.18</td>
+<td>0.12</td>
+<td>0.65</td>
 <td>0.77</td>
-<td>0.79</td>
+<td>0.49</td>
+<td>-0.01</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">depth</td>
-<td>0.1</td>
+<td>-0.18</td>
 <td>1.0</td>
-<td>-0.3</td>
-<td>0.03</td>
-<td>-0.04</td>
-<td>-0.04</td>
-<td>0.19</td>
+<td>-0.32</td>
+<td>-0.17</td>
+<td>-0.48</td>
+<td>-0.37</td>
+<td>0.49</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">table</td>
-<td>0.16</td>
-<td>-0.3</td>
+<td>0.12</td>
+<td>-0.32</td>
 <td>1.0</td>
-<td>0.13</td>
-<td>0.18</td>
-<td>0.14</td>
-<td>0.08</td>
+<td>0.0</td>
+<td>0.23</td>
+<td>0.12</td>
+<td>-0.18</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">price</td>
-<td>0.92</td>
-<td>0.03</td>
-<td>0.13</td>
+<td>0.65</td>
+<td>-0.17</td>
+<td>0.0</td>
 <td>1.0</td>
-<td>0.88</td>
-<td>0.87</td>
-<td>0.86</td>
+<td>0.37</td>
+<td>0.33</td>
+<td>0.06</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">x</td>
-<td>0.92</td>
-<td>-0.04</td>
-<td>0.18</td>
-<td>0.88</td>
+<td>0.77</td>
+<td>-0.48</td>
+<td>0.23</td>
+<td>0.37</td>
 <td>1.0</td>
-<td>0.87</td>
-<td>0.88</td>
+<td>0.64</td>
+<td>0.97</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">y</td>
-<td>0.77</td>
-<td>-0.04</td>
-<td>0.14</td>
-<td>0.87</td>
-<td>0.87</td>
+<td>0.49</td>
+<td>-0.37</td>
+<td>0.12</td>
+<td>0.33</td>
+<td>0.64</td>
 <td>1.0</td>
-<td>0.8</td>
+<td>0.15</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">z</td>
-<td>0.79</td>
-<td>0.19</td>
-<td>0.08</td>
-<td>0.86</td>
-<td>0.88</td>
-<td>0.8</td>
+<td>-0.01</td>
+<td>0.49</td>
+<td>-0.18</td>
+<td>0.06</td>
+<td>0.97</td>
+<td>0.15</td>
 <td>1.0</td>
 </tr>
 </tbody>
@@ -1044,13 +1039,13 @@ Name: price, dtype: float64</code></pre>
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>lin_reg[<span class="op">-</span><span class="dv">1</span>].coef_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="32">
-<pre><code>array([-1.09218051e+03,  1.23039248e+00, -4.85574021e+01,  5.30834709e+03,
-       -9.31443879e+01, -5.37068014e+01, -1.68143465e+15, -1.68143465e+15,
-       -1.68143465e+15, -1.68143465e+15, -1.68143465e+15,  1.05325052e+14,
-        1.05325052e+14,  1.05325052e+14,  1.05325052e+14,  1.05325052e+14,
-        1.05325052e+14,  1.05325052e+14, -2.44531644e+14, -2.44531644e+14,
-       -2.44531644e+14, -2.44531644e+14, -2.44531644e+14, -2.44531644e+14,
-       -2.44531644e+14, -2.44531644e+14])</code></pre>
+<pre><code>array([-1.25868758e+03,  1.27214638e+02, -2.14508727e+01,  5.34258409e+03,
+       -9.47981200e+01, -6.26319163e+01, -1.32338602e+14, -1.32338602e+14,
+       -1.32338602e+14, -1.32338602e+14, -1.32338602e+14, -1.31891651e+15,
+       -1.31891651e+15, -1.31891651e+15, -1.31891651e+15, -1.31891651e+15,
+       -1.31891651e+15, -1.31891651e+15, -4.95270736e+14, -4.95270736e+14,
+       -4.95270736e+14, -4.95270736e+14, -4.95270736e+14, -4.95270736e+14,
+       -4.95270736e+14, -4.95270736e+14])</code></pre>
 </div>
 </div>
 <div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-27T04:39:10.101743800Z&quot;,&quot;start_time&quot;:&quot;2023-10-27T04:39:10.073130800Z&quot;}" data-execution_count="33">
@@ -1062,7 +1057,7 @@ Name: price, dtype: float64</code></pre>
 <span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficient of Determination: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> r2_score(diamonds_price_test, diamonds_price_predictor))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Mean Squared Error: 1322700.06
+<pre><code>Mean Squared Error: 1290106.23
 Coefficient of Determination: 0.92</code></pre>
 </div>
 </div>
@@ -1132,7 +1127,7 @@ Coefficient of Determination: 0.92</code></pre>
 <span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficient of Determination: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> r2_score(diamonds_price_test, price_predictor_sgd))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Mean Squared Error: 1327264.91
+<pre><code>Mean Squared Error: 1288354.76
 Coefficient of Determination: 0.92</code></pre>
 </div>
 </div>
@@ -1198,7 +1193,7 @@ Coefficient of Determination: 0.92</code></pre>
 <span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficient of Determination: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> r2_score(diamonds_price_test, price_predictor_rfr))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Mean Squared Error: 309713.47
+<pre><code>Mean Squared Error: 301225.87
 Coefficient of Determination: 0.98</code></pre>
 </div>
 </div>
@@ -1449,7 +1444,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/sai-sundeep/sai-sundeep">
+    <a class="nav-link" href="https://github.com/sai-sundeep/saisundeep.github.io/tree/main">
       <i class="bi bi-github" role="img">
 </i> 
     </a>
