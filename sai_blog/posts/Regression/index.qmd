@@ -1,5 +1,5 @@
 ---
-title: "Linear and Non-Linear Regression"
+title: "Predicting Continuous Variables using Regression Analysis - Linear and Non-Linear Regression"
 author: "Sai Sundeep Rayidi"
 date: "2023-12-05"
 categories: [Linear Regression, Non-Linear Regression]
@@ -11,9 +11,20 @@ format:
 ---
 
 
+In this blogpost we will be getting to know some important and widely utilized machine learning models for estimating continuous variables - Regression analysis. Regression analysis can be used to estimate the value of one variable using the known values of other variables and predict results and shifts in a variable based on its relationship with other variables. For instance, regression analysis can be used to predict the sales of a product based on its price, advertising, and other factors. We will be learning the following concepts in this blog -
+
+1. Analyzing the **Diamonds** Dataset
+2. Linear Regression and Normal Equation
+3. Modeling non-linear relationships using Random Forests 
+
+
+## 1. Analyzing the Diamonds Dataset
+
+Let us start by importing some packages and loading the Diamonds dataset available in the Seaborn visualization package. We can get the high level overview of the dataset by exploring it using the   shape argument and describe method. We can see the first few records calling the head method on the diamonds dataframe. 
+
 ```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T16:32:07.748105900Z', start_time: '2023-10-26T16:32:07.732195300Z'}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-07T21:22:43.390734300Z', start_time: '2023-12-07T21:22:43.333273800Z'}
 #Import Packages
 import pandas as pd
 import numpy as np
@@ -25,229 +36,82 @@ import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 sns.set_theme(style="darkgrid")
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T15:52:31.912697Z', start_time: '2023-10-26T15:52:31.840067100Z'}
 diamonds = sns.load_dataset('diamonds')
-print(diamonds.shape)
-print(diamonds.describe())
-print(diamonds.head(10))
+print(f"Number of Observations: {diamonds.shape[0]}")
+print(f"Number of Features: {diamonds.shape[1]}")
+print(f"\nSummary Statistics of numerical features:\n {diamonds.describe()}")
+print(f"\nFew Sample Records: \n{diamonds.head(10)}")
 ```
 
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T16:35:00.031495600Z', start_time: '2023-10-26T16:34:59.143356600Z'}
-sns.histplot(data=diamonds, x='price', kde=True)
-plt.title('Diamonds Dataset - Price Distribution')
-plt.ylabel("# of sales")
-plt.xlabel("Price")
-plt.grid('both')
-plt.show()
-```
+Let us now explore the unique values in the 'cut', 'clarity', and 'color' features of the diamonds dataset, along with the unique number of observations in each class.  
+
+print("\nUnique clarity types and count of diamonds of each clarity type:\n")
+print(diamonds['clarity'].value_counts(ascending=False))
+print("\nUnique colors and count of diamonds of each color:\n")
+print(diamonds['color'].value_counts(ascending=False))
+print("\nUnique cut types and count of diamonds in each cut type:\n")
+print(diamonds['cut'].value_counts(ascending=False))
+
+There are eight different clarity types, seven different unique colors and five different cut types. It appears the sale of Ideal cut type is highest, with 21,551 diamonds sold. The highest sold clarity diamond is of type 13065, and color is 11,292.
+
+We will try to predict the price of the diamonds given the other independent variables like its weight (carat), color, cut, clarity, and other dimensions. So, let us see what is the correlation between the response variable price and other predictor variables.  
 
 ```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T16:33:12.952332800Z', start_time: '2023-10-26T16:33:12.777618Z'}
-sns.countplot(data=diamonds, y='cut', order=diamonds['cut'].value_counts().index,
-              palette=sns.color_palette('flare', 10))
-plt.title('Diamonds Dataset - sales by cut type')
-plt.xlabel('# of Sales')
-plt.ylabel('Cut Type')
-plt.grid('both')
-plt.tight_layout()
-plt.show()
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T16:33:02.939732500Z', start_time: '2023-10-26T16:33:02.748882100Z'}
-sns.countplot(data=diamonds, y='clarity', 
-              order = diamonds['clarity'].value_counts(ascending=True).index,
-              palette=sns.color_palette('flare', 10))
-plt.xlabel('# of Sales')
-plt.ylabel('Clarity Type')
-plt.title('Diamonds Dataset - Sales by Clarity Type')
-plt.grid('both')
-plt.tight_layout()
-plt.show()
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T16:32:46.643921Z', start_time: '2023-10-26T16:32:46.499217700Z'}
-sns.countplot(data=diamonds, 
-              x = 'color', 
-              order = diamonds['color'].value_counts(ascending=False).index,
-              palette=sns.color_palette('flare', 10))
-plt.ylabel('# of Sales')
-plt.xlabel('Color')
-plt.grid('both')
-plt.tight_layout()
-plt.show()
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T17:33:51.778661100Z', start_time: '2023-10-26T17:33:51.124834300Z'}
-sns.kdeplot(diamonds, x='price', hue='color', common_norm=False)
-plt.show()
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T17:40:50.068908900Z', start_time: '2023-10-26T17:40:50.050214200Z'}
-diamonds['clarity'].value_counts(ascending=False)
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T17:40:55.190610Z', start_time: '2023-10-26T17:40:55.132117500Z'}
-diamonds['color'].value_counts(ascending=False)
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T17:40:58.033141600Z', start_time: '2023-10-26T17:40:57.971438500Z'}
-diamonds['cut'].value_counts(ascending=False)
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T17:48:46.755062600Z', start_time: '2023-10-26T17:48:46.114742400Z'}
-# Analyzing distribution of numeric features with histogram plot
-sns.set_theme(style="whitegrid")
-diamonds.hist(bins=50, figsize=(12, 8))
-plt.show()
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T17:50:05.717996200Z', start_time: '2023-10-26T17:50:05.700818800Z'}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-07T22:00:21.785496200Z', start_time: '2023-12-07T22:00:21.762108900Z'}
 corr_matrix = diamonds.select_dtypes(np.number).corr()
+print("Correlation between price and other features: \n")
+print(corr_matrix['price'].sort_values(ascending=False))
 ```
 
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T17:50:37.123589900Z', start_time: '2023-10-26T17:50:37.107829500Z'}
-corr_matrix['price'].sort_values(ascending=False)
-```
+It appears that price is most correlated to carat variable, followed by other dimensions x, y, and z. Let us visualize the scatter matrix of the features in our dataset as well as a scatter plot between carat and price to see how the relationship between the features looks graphically. 
 
 ```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T18:47:58.235267500Z', start_time: '2023-10-26T18:47:52.530949500Z'}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-07T22:07:47.744495300Z', start_time: '2023-12-07T22:07:41.772531200Z'}
 from pandas.plotting import scatter_matrix
-scatter_matrix(diamonds[['price', 'carat', 'x', 'y', 'z', 'table', 'depth']], figsize=(15, 10))
+scatter_matrix(diamonds[['price', 'carat', 'x', 'y', 'z', 'table', 'depth']], figsize=(10, 10))
 plt.show()
 ```
 
 ```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T19:17:11.185590800Z', start_time: '2023-10-26T19:13:11.337356900Z'}
-from prettytable import PrettyTable
-def pretty_printing_function(correlation_name, row_values, column_names):
-    summary_table = PrettyTable()
-    summary_table.title = f"{correlation_name} Correlation Matrix for the tute1 dataset"
-    column_names = [f'Feature({chr(0x2193)})/({chr(0x2192)})'] + column_names
-    summary_table.field_names = column_names
-    for i in range(len(row_values)):
-        row_index = column_names[i+1]
-        row_values[i] = [row_index] + row_values[i]
-        summary_table.add_row(row_values[i])
-    print(summary_table)
-
-
-def calc_pearson_corr(x, y, N):
-    numerator_sum = 0.0; denomnator1_sum = 0.0; denomnator2_sum = 0.0
-    x_mean = np.mean(x)
-    y_mean = np.mean(y)
-    for i in range(N):
-        x_diff = x[i] - x_mean
-        y_diff = y[i] - y_mean
-        numerator_sum += (x_diff * y_diff)
-        denomnator1_sum += np.power(x_diff, 2)
-        denomnator2_sum += np.power(y_diff, 2)
-    pearson_corrcoef = numerator_sum/(np.sqrt(denomnator1_sum)*np.sqrt(denomnator2_sum))
-    return round(pearson_corrcoef, 2)
-
-
-def calc_partial_corr(x, y, z):
-    r_xy = calc_pearson_corr(x, y, len(diamonds))
-    r_xz = calc_pearson_corr(x, z, len(diamonds))
-    r_yz = calc_pearson_corr(y, z, len(diamonds))
-    partial_corr = (r_xy - (r_xz*r_yz)) / (np.sqrt(1 - r_xz**2) * np.sqrt(1 - r_yz**2))
-    return round(partial_corr, 2)
-
-
-diamonds_numeric = diamonds.select_dtypes(np.number)
-def calc_partial_correlation():
-    summary_df = pd.DataFrame(columns = diamonds_numeric.columns, index = diamonds_numeric.columns)
-    for col1 in diamonds_numeric.columns:
-        for col2 in diamonds_numeric.columns:
-            if col1 == col2:
-                summary_df.loc[col1, col2] = 1.0
-            else:
-                other_columns = list(set(diamonds_numeric.columns) - set([col1, col2]))
-                for col3 in other_columns:
-                    summary_df.loc[col1, col2] = calc_partial_corr(diamonds_numeric[col1], diamonds_numeric[col2], diamonds_numeric[col3])
-    pretty_printing_function("Partial", summary_df.values.tolist(), column_names=list(summary_df.columns))
-    return summary_df
-
-calc_partial_correlation()
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T19:56:20.076654700Z', start_time: '2023-10-26T19:56:19.898683400Z'}
-diamonds.plot(kind="scatter", x="price", y="carat",
-             alpha=0.07, grid=True)
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-07T22:07:47.918302800Z', start_time: '2023-12-07T22:07:47.744495300Z'}
+plt.figure(figsize=(8, 8))
+diamonds.plot(kind="scatter", x="price", y="carat", grid=True)
+plt.title("Scatter plot between price and carat")
 plt.show()
 ```
 
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T19:57:20.239470600Z', start_time: '2023-10-26T19:57:20.176523500Z'}
-diamonds.shape
-diamonds.head(10)
-```
+## 2. Linear Regression and the Normal Equation
+
+A linear regression model makes a prediction by calculating the weighted sum of the input features and a constant term called bias term. To put it formally, give a dataset of n observations denoted by ${\{y_{i},\,x_{i1},\ldots ,x_{ip}\}_{i=1}^{n}$ the linear regression model assumes that the relationship between the dependent variable y (also called a regressand or response variable) and the independent variables (also called regressors or predictor variables) is linear. Thus the simple linear regression model takes the form -
+
+$$\large {\displaystyle y_{i}=\beta _{0}+\beta _{1}x_{i1}+\cdots +\beta _{p}x_{ip}+\varepsilon _{i}=\mathbf {x} _{i}^{\mathsf {T}}{\boldsymbol {\beta }}+\varepsilon _{i},\qquad i=1,\ldots ,n,} $$
+
+Where, 
+$\epsilon$ is the error term or noise term which is there to explain the influence of all other factors other than regressors $x$.
+$\beta_{j}$ is the jth model parameter, also called the feature weights
+
+To train a regression model that can predict y values given x. We will need to find the values of $\beta$ that minimize the root mean squared error (MSE).    
+
+$$ {\displaystyle {\vec {\hat {\beta }}}={\underset {\vec {\beta }}{\mbox{arg min}}}\,L\left(D,{\vec {\beta }}\right)={\underset {\vec {\beta }}{\mbox{arg min}}}\sum _{i=1}^{n}\left({\vec {\beta }}\cdot {\vec {x_{i}}}-y_{i}\right)^{2}} $$   
+
+By putting in the dependent and independent variables and finding the gradient of this function, one can arrive at the equation of best parameters, by setting the gradient to zero -
+
+$$\large {\vec {\hat {\beta }}} = \left(X^{\textsf {T}}X\right)^{-1}X^{\textsf {T}}Y$$
+
+This is called the *Normal Equation*.
+
+Using Scikit Learn we can perform all these steps simply by calling the LinearRegression class with the predictor and response variables. However, we first need to encode our various categorical and numerical features. Lest us first build a pre-processing pipeline to do the same.  
 
 ```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T20:34:28.761383700Z', start_time: '2023-10-26T20:34:28.729891800Z'}
-# One-hot encode the categorical variabled before feeding into linear model
-from sklearn.preprocessing import OneHotEncoder
-
-diamonds_cut = diamonds[['cut']]
-
-enc = OneHotEncoder(handle_unknown='ignore')
-diamonds_cuts_onehot = enc.fit_transform(diamonds_cut)
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T20:35:01.475584200Z', start_time: '2023-10-26T20:35:01.455234Z'}
-enc.categories_
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T20:35:07.057193100Z', start_time: '2023-10-26T20:35:07.041259600Z'}
-enc.get_feature_names_out()
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T20:35:49.300424200Z', start_time: '2023-10-26T20:35:49.253212300Z'}
-diamonds_cuts_onehot.toarray()
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T20:58:46.490822300Z', start_time: '2023-10-26T20:58:46.455046Z'}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-07T23:52:01.026141500Z', start_time: '2023-12-07T23:52:00.798902Z'}
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import make_pipeline
 from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder
 
 categorical_features = ['cut', 'color', 'clarity']
 numeric_features = ['x', 'y', 'z', 'carat', 'depth', 'table']
@@ -263,125 +127,68 @@ preprocessor = ColumnTransformer(
 )
 ```
 
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T20:58:54.129989Z', start_time: '2023-10-26T20:58:54.114063100Z'}
-diamonds_features, diamonds_price = diamonds.loc[:, diamonds.columns != 'price'], diamonds['price']
-```
+We have built our pre-processing pipeline that will take care of both numerical and categorical features in our dataset. It will impute any missing values in the numerical columns and scale the features using StandardScaler(). In the case of categorical features, it will encode each unique value in carat, color, and cut to a numerical value. Let us now split the dataset into a train and test set for training and validation steps and train a linear regression model 
 
 ```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T20:58:55.560701100Z', start_time: '2023-10-26T20:58:55.558250500Z'}
-diamonds_features.shape
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T20:58:59.711588800Z', start_time: '2023-10-26T20:58:59.679956Z'}
-diamonds_price.shape
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-26T20:59:01.879385400Z', start_time: '2023-10-26T20:59:01.863274500Z'}
-diamonds_features.head()
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-27T04:12:35.470919700Z', start_time: '2023-10-27T04:12:35.391970900Z'}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-07T23:58:06.573538800Z', start_time: '2023-12-07T23:58:06.417763800Z'}
 from sklearn.model_selection import train_test_split
-diamonds_features_train, diamonds_features_test, diamonds_price_train, diamonds_price_test = train_test_split(diamonds_features, diamonds_price, test_size=0.25)
-
-#print(diamonds_features_train.head(), diamonds_price_train.head())
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-27T04:37:18.578767700Z', start_time: '2023-10-27T04:37:18.424856600Z'}
 from sklearn.linear_model import LinearRegression
+diamonds_features, diamonds_price = diamonds.loc[:, diamonds.columns != 'price'], diamonds['price']
+
+diamonds_features_train, diamonds_features_test, diamonds_price_train, diamonds_price_test = train_test_split(diamonds_features, diamonds_price, test_size=0.25)
 
 lin_reg = make_pipeline(preprocessor, LinearRegression())
 lin_reg.fit(diamonds_features_train, diamonds_price_train)
 ```
 
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-27T04:38:05.886747500Z', start_time: '2023-10-27T04:38:05.823902900Z'}
-lin_reg[:-1].get_feature_names_out()
-```
+We can make now make predictions using this trained model on our test samples. We can also visualize the coefficients (weights/parmaeters) of the features using the coef_ argument of the model. 
 
 ```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-27T04:38:49.389348800Z', start_time: '2023-10-27T04:38:49.006543500Z'}
-lin_reg_input_features = lin_reg[:-1].get_feature_names_out()
-pd.Series(lin_reg[-1].coef_.ravel(), index=lin_reg_input_features).plot.bar()
-plt.tight_layout()
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-08T00:18:22.083901400Z', start_time: '2023-12-08T00:18:22.068192100Z'}
+diamonds_price_predictions = lin_reg.predict(diamonds_features_test)
+print(f"Weights/Coefficients of predictors:\n {lin_reg[1].coef_}")
 ```
 
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-27T04:39:03.362019500Z', start_time: '2023-10-27T04:39:03.317344800Z'}
-diamonds_price_predictor = lin_reg.predict(diamonds_features_test)
-```
+We can see the performance of our model using these predictions and actual response variable values. The ***mean_squared_error*** and ***r2_score*** (also called coefficient of determination) tells us how well the model has performed on the test set. The R2 score provides the information about the goodness of fit of a model, that is, how well a regression line approximates the actual data. 
 
 ```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-27T04:39:05.682923900Z', start_time: '2023-10-27T04:39:05.650950500Z'}
-lin_reg[-1].coef_
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-27T04:39:10.101743800Z', start_time: '2023-10-27T04:39:10.073130800Z'}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-08T00:36:39.611417Z', start_time: '2023-12-08T00:36:39.595820100Z'}
 from sklearn.metrics import mean_squared_error, r2_score
 
-print("Mean Squared Error: %.2f" % mean_squared_error(diamonds_price_test, diamonds_price_predictor))
-print("Coefficient of Determination: %.2f" % r2_score(diamonds_price_test, diamonds_price_predictor))
+print("Mean Squared Error: %.2f" % mean_squared_error(diamonds_price_test, diamonds_price_predictions))
+print("Coefficient of Determination: %.2f" % r2_score(diamonds_price_test, diamonds_price_predictions))
 ```
 
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-27T04:42:29.514113800Z', start_time: '2023-10-27T04:42:27.577839400Z'}
-from sklearn.linear_model import SGDRegressor
+As we can see from above, the linear regression model we trained is able to account for 92% of the variance that's explained by the independent variables in our dataset. Which is good, but let us see how we can take that value up while also minimizing the mean squared error using non-linear regression technique like Random Forest Regressor.  
 
-sgd_reg = make_pipeline(preprocessor, SGDRegressor(max_iter=1000, tol=1e-5, penalty=None, eta0=0.01, n_iter_no_change=100, random_state=42))
-sgd_reg.fit(diamonds_features_train, diamonds_price_train)
-```
+## 3. Random Forests
 
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-27T04:46:31.440390200Z', start_time: '2023-10-27T04:46:31.392768Z'}
-price_predictor_sgd = sgd_reg.predict(diamonds_features_test)
-```
+Random Forest is an ensemble learning technique. Instead of training a single regressor or classifier, we will train an ensemble of models and choose the prediction that is averaged over all the models. The method used to train this ensemble model is called **bagging**, short for *bootstrap aggregating*. In bagging a single algorithm is chosen as the algorithm that all the models will use but each model will train on a random subset (with replacement) of the overall dataset. Once all the predictors are trained, the ensemble can make the prediction for an instance by simply aggregating the predictions of all the predictors. For regression problems, the aggregation function is usually average. The advantage of such a process is that its decision is based on multiple models rather than a single model - so its calculations are reliable and more accurate than individual predictor. Additionally, the ensemble has lower variance than a single predictor.
+
+Let us train a Random Forest Regressor to predict the diamonds price.  
 
 ```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-27T04:47:14.753844800Z', start_time: '2023-10-27T04:47:14.674575800Z'}
-print("Mean Squared Error: %.2f" % mean_squared_error(diamonds_price_test, price_predictor_sgd))
-print("Coefficient of Determination: %.2f" % r2_score(diamonds_price_test, price_predictor_sgd))
-```
-
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-27T04:52:16.717464500Z', start_time: '2023-10-27T04:51:28.881451600Z'}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-08T02:08:34.805998300Z', start_time: '2023-12-08T02:07:57.848591200Z'}
 from sklearn.ensemble import RandomForestRegressor
 
 rfr_reg = make_pipeline(preprocessor, RandomForestRegressor())
 rfr_reg.fit(diamonds_features_train, diamonds_price_train)
 ```
 
-```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-27T04:52:22.477783800Z', start_time: '2023-10-27T04:52:22.047258400Z'}
-price_predictor_rfr = rfr_reg.predict(diamonds_features_test)
-```
+Now that we trained the RandomForestRegressor, let us make predictions using it and evaluate its performance by calculating mean squared error and r2_score.
 
 ```{python}
-#| collapsed: true
-#| ExecuteTime: {end_time: '2023-10-27T04:52:38.698920Z', start_time: '2023-10-27T04:52:38.651693800Z'}
+#| collapsed: false
+#| ExecuteTime: {end_time: '2023-12-08T02:25:18.664305200Z', start_time: '2023-12-08T02:25:18.327114700Z'}
+price_predictor_rfr = rfr_reg.predict(diamonds_features_test)
 print("Mean Squared Error: %.2f" % mean_squared_error(diamonds_price_test, price_predictor_rfr))
 print("Coefficient of Determination: %.2f" % r2_score(diamonds_price_test, price_predictor_rfr))
 ```
+
+Great! the random forest regressor is able to approximate the actual data much better than the linear regression model we built earlier. Also, the mean squared error is reduced by huge margin. Random Forest is more flexible than linear regression which tries to fit a line to the data while a non-linear regression technique like Decision Trees and Random Forests uses a curve to show association.
 
 
