@@ -9,7 +9,7 @@
 <meta name="author" content="Sai Sundeep Rayidi">
 <meta name="dcterms.date" content="2023-12-05">
 
-<title>Sai’s ML blog - Linear and Non-Linear Regression</title>
+<title>Sai’s ML blog - Predicting Continuous Variables using Regression Analysis - Linear and Non-Linear Regression</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -98,13 +98,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../../styles.css">
-<meta property="og:title" content="Sai’s ML blog - Linear and Non-Linear Regression">
+<meta property="og:title" content="Sai’s ML blog - Predicting Continuous Variables using Regression Analysis - Linear and Non-Linear Regression">
+<meta property="og:description" content="">
 <meta property="og:image" content="https://sai-sundeep.github.io/saisundeep.github.io/posts/Regression/index_files/figure-html/cell-4-output-1.png">
 <meta property="og:site-name" content="Sai's ML blog">
-<meta property="og:image:height" content="909">
-<meta property="og:image:width" content="1210">
+<meta property="og:image:height" content="1641">
+<meta property="og:image:width" content="1650">
 </head>
 
 <body class="nav-fixed fullcontent">
@@ -161,7 +164,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Linear and Non-Linear Regression</h1>
+      <h1 class="title">Predicting Continuous Variables using Regression Analysis - Linear and Non-Linear Regression</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">Linear Regression</div>
                 <div class="quarto-category">Non-Linear Regression</div>
@@ -200,7 +203,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T16:32:07.748105900Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T16:32:07.732195300Z&quot;}" data-execution_count="1">
+<p>In this blogpost we will be getting to know some important and widely utilized machine learning models for estimating continuous variables - Regression analysis. Regression analysis can be used to estimate the value of one variable using the known values of other variables and predict results and shifts in a variable based on its relationship with other variables. For instance, regression analysis can be used to predict the sales of a product based on its price, advertising, and other factors. We will be learning the following concepts in this blog -</p>
+<ol type="1">
+<li>Analyzing the <strong>Diamonds</strong> Dataset</li>
+<li>Linear Regression and Normal Equation</li>
+<li>Modeling non-linear relationships using Random Forests</li>
+</ol>
+<section id="analyzing-the-diamonds-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="analyzing-the-diamonds-dataset">1. Analyzing the Diamonds Dataset</h2>
+<p>Let us start by importing some packages and loading the Diamonds dataset available in the Seaborn visualization package. We can get the high level overview of the dataset by exploring it using the shape argument and describe method. We can see the first few records calling the head method on the diamonds dataframe.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-07T21:22:43.390734300Z&quot;,&quot;start_time&quot;:&quot;2023-12-07T21:22:43.333273800Z&quot;}" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Import Packages</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -211,16 +223,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>, category<span class="op">=</span><span class="pp">FutureWarning</span>)</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>, category<span class="op">=</span><span class="pp">UserWarning</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">"darkgrid"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T15:52:31.912697Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T15:52:31.840067100Z&quot;}" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>diamonds <span class="op">=</span> sns.load_dataset(<span class="st">'diamonds'</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(diamonds.shape)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(diamonds.describe())</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(diamonds.head(<span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">"darkgrid"</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>diamonds <span class="op">=</span> sns.load_dataset(<span class="st">'diamonds'</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of Observations: </span><span class="sc">{</span>diamonds<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of Features: </span><span class="sc">{</span>diamonds<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Summary Statistics of numerical features:</span><span class="ch">\n</span><span class="ss"> </span><span class="sc">{</span>diamonds<span class="sc">.</span>describe()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Few Sample Records: </span><span class="ch">\n</span><span class="sc">{</span>diamonds<span class="sc">.</span>head(<span class="dv">10</span>)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>(53940, 10)
-              carat         depth         table         price             x  \
+<pre><code>Number of Observations: 53940
+Number of Features: 10
+
+Summary Statistics of numerical features:
+               carat         depth         table         price             x  \
 count  53940.000000  53940.000000  53940.000000  53940.000000  53940.000000   
 mean       0.797940     61.749405     57.457184   3932.799722      5.731157   
 std        0.474011      1.432621      2.234491   3989.439738      1.121761   
@@ -239,6 +253,8 @@ min        0.000000      0.000000
 50%        5.710000      3.530000  
 75%        6.540000      4.040000  
 max       58.900000     31.800000  
+
+Few Sample Records: 
    carat        cut color clarity  depth  table  price     x     y     z
 0   0.23      Ideal     E     SI2   61.5   55.0    326  3.95  3.98  2.43
 1   0.21    Premium     E     SI1   59.8   61.0    326  3.89  3.84  2.31
@@ -252,122 +268,18 @@ max       58.900000     31.800000
 9   0.23  Very Good     H     VS1   59.4   61.0    338  4.00  4.05  2.39</code></pre>
 </div>
 </div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T16:35:00.031495600Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T16:34:59.143356600Z&quot;}" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sns.histplot(data<span class="op">=</span>diamonds, x<span class="op">=</span><span class="st">'price'</span>, kde<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Diamonds Dataset - Price Distribution'</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"# of sales"</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Price"</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="st">'both'</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-4-output-1.png" width="605" height="455"></p>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T16:33:12.952332800Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T16:33:12.777618Z&quot;}" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sns.countplot(data<span class="op">=</span>diamonds, y<span class="op">=</span><span class="st">'cut'</span>, order<span class="op">=</span>diamonds[<span class="st">'cut'</span>].value_counts().index,</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>              palette<span class="op">=</span>sns.color_palette(<span class="st">'flare'</span>, <span class="dv">10</span>))</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Diamonds Dataset - sales by cut type'</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'# of Sales'</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Cut Type'</span>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="st">'both'</span>)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-5-output-1.png" width="656" height="464"></p>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T16:33:02.939732500Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T16:33:02.748882100Z&quot;}" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sns.countplot(data<span class="op">=</span>diamonds, y<span class="op">=</span><span class="st">'clarity'</span>, </span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>              order <span class="op">=</span> diamonds[<span class="st">'clarity'</span>].value_counts(ascending<span class="op">=</span><span class="va">True</span>).index,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>              palette<span class="op">=</span>sns.color_palette(<span class="st">'flare'</span>, <span class="dv">10</span>))</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'# of Sales'</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Clarity Type'</span>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Diamonds Dataset - Sales by Clarity Type'</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="st">'both'</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-6-output-1.png" width="656" height="464"></p>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T16:32:46.643921Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T16:32:46.499217700Z&quot;}" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>sns.countplot(data<span class="op">=</span>diamonds, </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>              x <span class="op">=</span> <span class="st">'color'</span>, </span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>              order <span class="op">=</span> diamonds[<span class="st">'color'</span>].value_counts(ascending<span class="op">=</span><span class="va">False</span>).index,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>              palette<span class="op">=</span>sns.color_palette(<span class="st">'flare'</span>, <span class="dv">10</span>))</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'# of Sales'</span>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Color'</span>)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="st">'both'</span>)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-7-output-1.png" width="656" height="464"></p>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T17:33:51.778661100Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T17:33:51.124834300Z&quot;}" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sns.kdeplot(diamonds, x<span class="op">=</span><span class="st">'price'</span>, hue<span class="op">=</span><span class="st">'color'</span>, common_norm<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-8-output-1.png" width="626" height="435"></p>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T17:40:50.068908900Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T17:40:50.050214200Z&quot;}" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>diamonds[<span class="st">'clarity'</span>].value_counts(ascending<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="8">
-<pre><code>clarity
-SI1     13065
-VS2     12258
-SI2      9194
-VS1      8171
-VVS2     5066
-VVS1     3655
-IF       1790
-I1        741
-Name: count, dtype: int64</code></pre>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T17:40:55.190610Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T17:40:55.132117500Z&quot;}" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>diamonds[<span class="st">'color'</span>].value_counts(ascending<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
-<pre><code>color
-G    11292
-E     9797
-F     9542
-H     8304
-D     6775
-I     5422
-J     2808
-Name: count, dtype: int64</code></pre>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T17:40:58.033141600Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T17:40:57.971438500Z&quot;}" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>diamonds[<span class="st">'cut'</span>].value_counts(ascending<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="10">
-<pre><code>cut
-Ideal        21551
-Premium      13791
-Very Good    12082
-Good          4906
-Fair          1610
-Name: count, dtype: int64</code></pre>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T17:48:46.755062600Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T17:48:46.114742400Z&quot;}" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Analyzing distribution of numeric features with histogram plot</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">"whitegrid"</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>diamonds.hist(bins<span class="op">=</span><span class="dv">50</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-12-output-1.png" width="967" height="657"></p>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T17:50:05.717996200Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T17:50:05.700818800Z&quot;}" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>corr_matrix <span class="op">=</span> diamonds.select_dtypes(np.number).corr()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T17:50:37.123589900Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T17:50:37.107829500Z&quot;}" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>corr_matrix[<span class="st">'price'</span>].sort_values(ascending<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="13">
-<pre><code>price    1.000000
+<p>Let us now explore the unique values in the ‘cut’, ‘clarity’, and ‘color’ features of the diamonds dataset, along with the unique number of observations in each class.</p>
+<p>print(“clarity types and count of diamonds of each clarity type:”) print(diamonds[‘clarity’].value_counts(ascending=False)) print(“colors and count of diamonds of each color:”) print(diamonds[‘color’].value_counts(ascending=False)) print(“cut types and count of diamonds in each cut type:”) print(diamonds[‘cut’].value_counts(ascending=False))</p>
+<p>There are eight different clarity types, seven different unique colors and five different cut types. It appears the sale of Ideal cut type is highest, with 21,551 diamonds sold. The highest sold clarity diamond is of type 13065, and color is 11,292.</p>
+<p>We will try to predict the price of the diamonds given the other independent variables like its weight (carat), color, cut, clarity, and other dimensions. So, let us see what is the correlation between the response variable price and other predictor variables.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-07T22:00:21.785496200Z&quot;,&quot;start_time&quot;:&quot;2023-12-07T22:00:21.762108900Z&quot;}" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>corr_matrix <span class="op">=</span> diamonds.select_dtypes(np.number).corr()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Correlation between price and other features: </span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(corr_matrix[<span class="st">'price'</span>].sort_values(ascending<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Correlation between price and other features: 
+
+price    1.000000
 carat    0.921591
 x        0.884435
 y        0.865421
@@ -377,509 +289,69 @@ depth   -0.010647
 Name: price, dtype: float64</code></pre>
 </div>
 </div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T18:47:58.235267500Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T18:47:52.530949500Z&quot;}" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pandas.plotting <span class="im">import</span> scatter_matrix</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>scatter_matrix(diamonds[[<span class="st">'price'</span>, <span class="st">'carat'</span>, <span class="st">'x'</span>, <span class="st">'y'</span>, <span class="st">'z'</span>, <span class="st">'table'</span>, <span class="st">'depth'</span>]], figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">10</span>))</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>It appears that price is most correlated to carat variable, followed by other dimensions x, y, and z. Let us visualize the scatter matrix of the features in our dataset as well as a scatter plot between carat and price to see how the relationship between the features looks graphically.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-07T22:07:47.744495300Z&quot;,&quot;start_time&quot;:&quot;2023-12-07T22:07:41.772531200Z&quot;}" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pandas.plotting <span class="im">import</span> scatter_matrix</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>scatter_matrix(diamonds[[<span class="st">'price'</span>, <span class="st">'carat'</span>, <span class="st">'x'</span>, <span class="st">'y'</span>, <span class="st">'z'</span>, <span class="st">'table'</span>, <span class="st">'depth'</span>]], figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-15-output-1.png" width="1197" height="821"></p>
+<p><img src="index_files/figure-html/cell-4-output-1.png" width="825" height="821"></p>
 </div>
 </div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T19:17:11.185590800Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T19:13:11.337356900Z&quot;}" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> prettytable <span class="im">import</span> PrettyTable</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pretty_printing_function(correlation_name, row_values, column_names):</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    summary_table <span class="op">=</span> PrettyTable()</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    summary_table.title <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>correlation_name<span class="sc">}</span><span class="ss"> Correlation Matrix for the tute1 dataset"</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    column_names <span class="op">=</span> [<span class="ss">f'Feature(</span><span class="sc">{</span><span class="bu">chr</span>(<span class="bn">0x2193</span>)<span class="sc">}</span><span class="ss">)/(</span><span class="sc">{</span><span class="bu">chr</span>(<span class="bn">0x2192</span>)<span class="sc">}</span><span class="ss">)'</span>] <span class="op">+</span> column_names</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    summary_table.field_names <span class="op">=</span> column_names</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(row_values)):</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>        row_index <span class="op">=</span> column_names[i<span class="op">+</span><span class="dv">1</span>]</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>        row_values[i] <span class="op">=</span> [row_index] <span class="op">+</span> row_values[i]</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>        summary_table.add_row(row_values[i])</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(summary_table)</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calc_pearson_corr(x, y, N):</span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    numerator_sum <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span> denomnator1_sum <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span> denomnator2_sum <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    x_mean <span class="op">=</span> np.mean(x)</span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    y_mean <span class="op">=</span> np.mean(y)</span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):</span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>        x_diff <span class="op">=</span> x[i] <span class="op">-</span> x_mean</span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>        y_diff <span class="op">=</span> y[i] <span class="op">-</span> y_mean</span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>        numerator_sum <span class="op">+=</span> (x_diff <span class="op">*</span> y_diff)</span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>        denomnator1_sum <span class="op">+=</span> np.power(x_diff, <span class="dv">2</span>)</span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>        denomnator2_sum <span class="op">+=</span> np.power(y_diff, <span class="dv">2</span>)</span>
-<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>    pearson_corrcoef <span class="op">=</span> numerator_sum<span class="op">/</span>(np.sqrt(denomnator1_sum)<span class="op">*</span>np.sqrt(denomnator2_sum))</span>
-<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">round</span>(pearson_corrcoef, <span class="dv">2</span>)</span>
-<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calc_partial_corr(x, y, z):</span>
-<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>    r_xy <span class="op">=</span> calc_pearson_corr(x, y, <span class="bu">len</span>(diamonds))</span>
-<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>    r_xz <span class="op">=</span> calc_pearson_corr(x, z, <span class="bu">len</span>(diamonds))</span>
-<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>    r_yz <span class="op">=</span> calc_pearson_corr(y, z, <span class="bu">len</span>(diamonds))</span>
-<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>    partial_corr <span class="op">=</span> (r_xy <span class="op">-</span> (r_xz<span class="op">*</span>r_yz)) <span class="op">/</span> (np.sqrt(<span class="dv">1</span> <span class="op">-</span> r_xz<span class="op">**</span><span class="dv">2</span>) <span class="op">*</span> np.sqrt(<span class="dv">1</span> <span class="op">-</span> r_yz<span class="op">**</span><span class="dv">2</span>))</span>
-<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">round</span>(partial_corr, <span class="dv">2</span>)</span>
-<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>diamonds_numeric <span class="op">=</span> diamonds.select_dtypes(np.number)</span>
-<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calc_partial_correlation():</span>
-<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>    summary_df <span class="op">=</span> pd.DataFrame(columns <span class="op">=</span> diamonds_numeric.columns, index <span class="op">=</span> diamonds_numeric.columns)</span>
-<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> col1 <span class="kw">in</span> diamonds_numeric.columns:</span>
-<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> col2 <span class="kw">in</span> diamonds_numeric.columns:</span>
-<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> col1 <span class="op">==</span> col2:</span>
-<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a>                summary_df.loc[col1, col2] <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
-<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a>                other_columns <span class="op">=</span> <span class="bu">list</span>(<span class="bu">set</span>(diamonds_numeric.columns) <span class="op">-</span> <span class="bu">set</span>([col1, col2]))</span>
-<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> col3 <span class="kw">in</span> other_columns:</span>
-<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a>                    summary_df.loc[col1, col2] <span class="op">=</span> calc_partial_corr(diamonds_numeric[col1], diamonds_numeric[col2], diamonds_numeric[col3])</span>
-<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a>    pretty_printing_function(<span class="st">"Partial"</span>, summary_df.values.tolist(), column_names<span class="op">=</span><span class="bu">list</span>(summary_df.columns))</span>
-<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> summary_df</span>
-<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a>calc_partial_correlation()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>+------------------------------------------------------------------------+
-|            Partial Correlation Matrix for the tute1 dataset            |
-+----------------+-------+-------+-------+-------+-------+-------+-------+
-| Feature(↓)/(→) | carat | depth | table | price |   x   |   y   |   z   |
-+----------------+-------+-------+-------+-------+-------+-------+-------+
-|     carat      |  1.0  |  0.1  |  0.16 |  0.92 |  0.92 |  0.77 |  0.79 |
-|     depth      |  0.1  |  1.0  |  -0.3 |  -0.1 | -0.04 | -0.04 |  0.19 |
-|     table      |  0.16 |  -0.3 |  1.0  | -0.09 |  0.18 |  0.14 |  0.08 |
-|     price      |  0.92 |  -0.1 | -0.09 |  1.0  | -0.28 | -0.03 | -0.11 |
-|       x        |  0.92 | -0.04 |  0.18 | -0.28 |  1.0  |  0.87 |  0.88 |
-|       y        |  0.77 | -0.04 |  0.14 | -0.03 |  0.87 |  1.0  |  0.8  |
-|       z        |  0.79 |  0.19 |  0.08 | -0.11 |  0.88 |  0.8  |  1.0  |
-+----------------+-------+-------+-------+-------+-------+-------+-------+</code></pre>
-</div>
-<div class="cell-output cell-output-display" data-execution_count="15">
-<div>
-
-
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">carat</th>
-<th data-quarto-table-cell-role="th">depth</th>
-<th data-quarto-table-cell-role="th">table</th>
-<th data-quarto-table-cell-role="th">price</th>
-<th data-quarto-table-cell-role="th">x</th>
-<th data-quarto-table-cell-role="th">y</th>
-<th data-quarto-table-cell-role="th">z</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">carat</td>
-<td>1.0</td>
-<td>0.1</td>
-<td>0.16</td>
-<td>0.92</td>
-<td>0.92</td>
-<td>0.77</td>
-<td>0.79</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">depth</td>
-<td>0.1</td>
-<td>1.0</td>
-<td>-0.3</td>
-<td>-0.1</td>
-<td>-0.04</td>
-<td>-0.04</td>
-<td>0.19</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">table</td>
-<td>0.16</td>
-<td>-0.3</td>
-<td>1.0</td>
-<td>-0.09</td>
-<td>0.18</td>
-<td>0.14</td>
-<td>0.08</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">price</td>
-<td>0.92</td>
-<td>-0.1</td>
-<td>-0.09</td>
-<td>1.0</td>
-<td>-0.28</td>
-<td>-0.03</td>
-<td>-0.11</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">x</td>
-<td>0.92</td>
-<td>-0.04</td>
-<td>0.18</td>
-<td>-0.28</td>
-<td>1.0</td>
-<td>0.87</td>
-<td>0.88</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">y</td>
-<td>0.77</td>
-<td>-0.04</td>
-<td>0.14</td>
-<td>-0.03</td>
-<td>0.87</td>
-<td>1.0</td>
-<td>0.8</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">z</td>
-<td>0.79</td>
-<td>0.19</td>
-<td>0.08</td>
-<td>-0.11</td>
-<td>0.88</td>
-<td>0.8</td>
-<td>1.0</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T19:56:20.076654700Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T19:56:19.898683400Z&quot;}" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>diamonds.plot(kind<span class="op">=</span><span class="st">"scatter"</span>, x<span class="op">=</span><span class="st">"price"</span>, y<span class="op">=</span><span class="st">"carat"</span>,</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>             alpha<span class="op">=</span><span class="fl">0.07</span>, grid<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-07T22:07:47.918302800Z&quot;,&quot;start_time&quot;:&quot;2023-12-07T22:07:47.744495300Z&quot;}" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">8</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>diamonds.plot(kind<span class="op">=</span><span class="st">"scatter"</span>, x<span class="op">=</span><span class="st">"price"</span>, y<span class="op">=</span><span class="st">"carat"</span>, grid<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Scatter plot between price and carat"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-17-output-1.png" width="581" height="435"></p>
+<pre><code>&lt;Figure size 768x768 with 0 Axes&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-5-output-2.png" width="581" height="455"></p>
 </div>
 </div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T19:57:20.239470600Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T19:57:20.176523500Z&quot;}" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>diamonds.shape</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>diamonds.head(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="17">
-<div>
-
-
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">carat</th>
-<th data-quarto-table-cell-role="th">cut</th>
-<th data-quarto-table-cell-role="th">color</th>
-<th data-quarto-table-cell-role="th">clarity</th>
-<th data-quarto-table-cell-role="th">depth</th>
-<th data-quarto-table-cell-role="th">table</th>
-<th data-quarto-table-cell-role="th">price</th>
-<th data-quarto-table-cell-role="th">x</th>
-<th data-quarto-table-cell-role="th">y</th>
-<th data-quarto-table-cell-role="th">z</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>0.23</td>
-<td>Ideal</td>
-<td>E</td>
-<td>SI2</td>
-<td>61.5</td>
-<td>55.0</td>
-<td>326</td>
-<td>3.95</td>
-<td>3.98</td>
-<td>2.43</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>0.21</td>
-<td>Premium</td>
-<td>E</td>
-<td>SI1</td>
-<td>59.8</td>
-<td>61.0</td>
-<td>326</td>
-<td>3.89</td>
-<td>3.84</td>
-<td>2.31</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>0.23</td>
-<td>Good</td>
-<td>E</td>
-<td>VS1</td>
-<td>56.9</td>
-<td>65.0</td>
-<td>327</td>
-<td>4.05</td>
-<td>4.07</td>
-<td>2.31</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>0.29</td>
-<td>Premium</td>
-<td>I</td>
-<td>VS2</td>
-<td>62.4</td>
-<td>58.0</td>
-<td>334</td>
-<td>4.20</td>
-<td>4.23</td>
-<td>2.63</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>0.31</td>
-<td>Good</td>
-<td>J</td>
-<td>SI2</td>
-<td>63.3</td>
-<td>58.0</td>
-<td>335</td>
-<td>4.34</td>
-<td>4.35</td>
-<td>2.75</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5</td>
-<td>0.24</td>
-<td>Very Good</td>
-<td>J</td>
-<td>VVS2</td>
-<td>62.8</td>
-<td>57.0</td>
-<td>336</td>
-<td>3.94</td>
-<td>3.96</td>
-<td>2.48</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">6</td>
-<td>0.24</td>
-<td>Very Good</td>
-<td>I</td>
-<td>VVS1</td>
-<td>62.3</td>
-<td>57.0</td>
-<td>336</td>
-<td>3.95</td>
-<td>3.98</td>
-<td>2.47</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">7</td>
-<td>0.26</td>
-<td>Very Good</td>
-<td>H</td>
-<td>SI1</td>
-<td>61.9</td>
-<td>55.0</td>
-<td>337</td>
-<td>4.07</td>
-<td>4.11</td>
-<td>2.53</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>0.22</td>
-<td>Fair</td>
-<td>E</td>
-<td>VS2</td>
-<td>65.1</td>
-<td>61.0</td>
-<td>337</td>
-<td>3.87</td>
-<td>3.78</td>
-<td>2.49</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>0.23</td>
-<td>Very Good</td>
-<td>H</td>
-<td>VS1</td>
-<td>59.4</td>
-<td>61.0</td>
-<td>338</td>
-<td>4.00</td>
-<td>4.05</td>
-<td>2.39</td>
-</tr>
-</tbody>
-</table>
-
+</section>
+<section id="linear-regression-and-the-normal-equation" class="level2">
+<h2 class="anchored" data-anchor-id="linear-regression-and-the-normal-equation">2. Linear Regression and the Normal Equation</h2>
+<p>A linear regression model makes a prediction by calculating the weighted sum of the input features and a constant term called bias term. To put it formally, give a dataset of n observations denoted by <span class="math inline">\({\{y_{i},\,x_{i1},\ldots ,x_{ip}\}_{i=1}^{n}\)</span> the linear regression model assumes that the relationship between the dependent variable y (also called a regressand or response variable) and the independent variables (also called regressors or predictor variables) is linear. Thus the simple linear regression model takes the form -</p>
+<p><span class="math display">\[\large {\displaystyle y_{i}=\beta _{0}+\beta _{1}x_{i1}+\cdots +\beta _{p}x_{ip}+\varepsilon _{i}=\mathbf {x} _{i}^{\mathsf {T}}{\boldsymbol {\beta }}+\varepsilon _{i},\qquad i=1,\ldots ,n,} \]</span></p>
+<p>Where, <span class="math inline">\(\epsilon\)</span> is the error term or noise term which is there to explain the influence of all other factors other than regressors <span class="math inline">\(x\)</span>. <span class="math inline">\(\beta_{j}\)</span> is the jth model parameter, also called the feature weights</p>
+<p>To train a regression model that can predict y values given x. We will need to find the values of <span class="math inline">\(\beta\)</span> that minimize the root mean squared error (MSE).</p>
+<p><span class="math display">\[ {\displaystyle {\vec {\hat {\beta }}}={\underset {\vec {\beta }}{\mbox{arg min}}}\,L\left(D,{\vec {\beta }}\right)={\underset {\vec {\beta }}{\mbox{arg min}}}\sum _{i=1}^{n}\left({\vec {\beta }}\cdot {\vec {x_{i}}}-y_{i}\right)^{2}} \]</span></p>
+<p>By putting in the dependent and independent variables and finding the gradient of this function, one can arrive at the equation of best parameters, by setting the gradient to zero -</p>
+<p><span class="math display">\[\large {\vec {\hat {\beta }}} = \left(X^{\textsf {T}}X\right)^{-1}X^{\textsf {T}}Y\]</span></p>
+<p>This is called the <em>Normal Equation</em>.</p>
+<p>Using Scikit Learn we can perform all these steps simply by calling the LinearRegression class with the predictor and response variables. However, we first need to encode our various categorical and numerical features. Lest us first build a pre-processing pipeline to do the same.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-07T23:52:01.026141500Z&quot;,&quot;start_time&quot;:&quot;2023-12-07T23:52:00.798902Z&quot;}" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.compose <span class="im">import</span> ColumnTransformer</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> make_pipeline</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.impute <span class="im">import</span> SimpleImputer</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> OneHotEncoder</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>categorical_features <span class="op">=</span> [<span class="st">'cut'</span>, <span class="st">'color'</span>, <span class="st">'clarity'</span>]</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>numeric_features <span class="op">=</span> [<span class="st">'x'</span>, <span class="st">'y'</span>, <span class="st">'z'</span>, <span class="st">'carat'</span>, <span class="st">'depth'</span>, <span class="st">'table'</span>]</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> make_pipeline(SimpleImputer(strategy<span class="op">=</span><span class="st">'median'</span>), StandardScaler())</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>preprocessor <span class="op">=</span> ColumnTransformer(</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        (<span class="st">'num'</span>, numeric_transformer, numeric_features),</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        (<span class="st">'cat'</span>, OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">'ignore'</span>, sparse_output<span class="op">=</span><span class="va">False</span>), categorical_features),</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    verbose_feature_names_out<span class="op">=</span><span class="va">False</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T20:34:28.761383700Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T20:34:28.729891800Z&quot;}" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># One-hot encode the categorical variabled before feeding into linear model</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> OneHotEncoder</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>diamonds_cut <span class="op">=</span> diamonds[[<span class="st">'cut'</span>]]</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>enc <span class="op">=</span> OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">'ignore'</span>)</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>diamonds_cuts_onehot <span class="op">=</span> enc.fit_transform(diamonds_cut)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T20:35:01.475584200Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T20:35:01.455234Z&quot;}" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>enc.categories_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="19">
-<pre><code>[array(['Fair', 'Good', 'Ideal', 'Premium', 'Very Good'], dtype=object)]</code></pre>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T20:35:07.057193100Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T20:35:07.041259600Z&quot;}" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>enc.get_feature_names_out()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="20">
-<pre><code>array(['cut_Fair', 'cut_Good', 'cut_Ideal', 'cut_Premium',
-       'cut_Very Good'], dtype=object)</code></pre>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T20:35:49.300424200Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T20:35:49.253212300Z&quot;}" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>diamonds_cuts_onehot.toarray()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="21">
-<pre><code>array([[0., 0., 1., 0., 0.],
-       [0., 0., 0., 1., 0.],
-       [0., 1., 0., 0., 0.],
-       ...,
-       [0., 0., 0., 0., 1.],
-       [0., 0., 0., 1., 0.],
-       [0., 0., 1., 0., 0.]])</code></pre>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T20:58:46.490822300Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T20:58:46.455046Z&quot;}" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.compose <span class="im">import</span> ColumnTransformer</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> make_pipeline</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.impute <span class="im">import</span> SimpleImputer</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>categorical_features <span class="op">=</span> [<span class="st">'cut'</span>, <span class="st">'color'</span>, <span class="st">'clarity'</span>]</span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>numeric_features <span class="op">=</span> [<span class="st">'x'</span>, <span class="st">'y'</span>, <span class="st">'z'</span>, <span class="st">'carat'</span>, <span class="st">'depth'</span>, <span class="st">'table'</span>]</span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>numeric_transformer <span class="op">=</span> make_pipeline(SimpleImputer(strategy<span class="op">=</span><span class="st">'median'</span>), StandardScaler())</span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>preprocessor <span class="op">=</span> ColumnTransformer(</span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>    [</span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>        (<span class="st">'num'</span>, numeric_transformer, numeric_features),</span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>        (<span class="st">'cat'</span>, OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">'ignore'</span>, sparse_output<span class="op">=</span><span class="va">False</span>), categorical_features),</span>
-<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>    ],</span>
-<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>    verbose_feature_names_out<span class="op">=</span><span class="va">False</span></span>
-<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T20:58:54.129989Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T20:58:54.114063100Z&quot;}" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>diamonds_features, diamonds_price <span class="op">=</span> diamonds.loc[:, diamonds.columns <span class="op">!=</span> <span class="st">'price'</span>], diamonds[<span class="st">'price'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T20:58:55.560701100Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T20:58:55.558250500Z&quot;}" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>diamonds_features.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="24">
-<pre><code>(53940, 9)</code></pre>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T20:58:59.711588800Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T20:58:59.679956Z&quot;}" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>diamonds_price.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="25">
-<pre><code>(53940,)</code></pre>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-26T20:59:01.879385400Z&quot;,&quot;start_time&quot;:&quot;2023-10-26T20:59:01.863274500Z&quot;}" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>diamonds_features.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="26">
-<div>
-
-
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">carat</th>
-<th data-quarto-table-cell-role="th">cut</th>
-<th data-quarto-table-cell-role="th">color</th>
-<th data-quarto-table-cell-role="th">clarity</th>
-<th data-quarto-table-cell-role="th">depth</th>
-<th data-quarto-table-cell-role="th">table</th>
-<th data-quarto-table-cell-role="th">x</th>
-<th data-quarto-table-cell-role="th">y</th>
-<th data-quarto-table-cell-role="th">z</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>0.23</td>
-<td>Ideal</td>
-<td>E</td>
-<td>SI2</td>
-<td>61.5</td>
-<td>55.0</td>
-<td>3.95</td>
-<td>3.98</td>
-<td>2.43</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>0.21</td>
-<td>Premium</td>
-<td>E</td>
-<td>SI1</td>
-<td>59.8</td>
-<td>61.0</td>
-<td>3.89</td>
-<td>3.84</td>
-<td>2.31</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>0.23</td>
-<td>Good</td>
-<td>E</td>
-<td>VS1</td>
-<td>56.9</td>
-<td>65.0</td>
-<td>4.05</td>
-<td>4.07</td>
-<td>2.31</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>0.29</td>
-<td>Premium</td>
-<td>I</td>
-<td>VS2</td>
-<td>62.4</td>
-<td>58.0</td>
-<td>4.20</td>
-<td>4.23</td>
-<td>2.63</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>0.31</td>
-<td>Good</td>
-<td>J</td>
-<td>SI2</td>
-<td>63.3</td>
-<td>58.0</td>
-<td>4.34</td>
-<td>4.35</td>
-<td>2.75</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-27T04:12:35.470919700Z&quot;,&quot;start_time&quot;:&quot;2023-10-27T04:12:35.391970900Z&quot;}" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>diamonds_features_train, diamonds_features_test, diamonds_price_train, diamonds_price_test <span class="op">=</span> train_test_split(diamonds_features, diamonds_price, test_size<span class="op">=</span><span class="fl">0.25</span>)</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="co">#print(diamonds_features_train.head(), diamonds_price_train.head())</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-27T04:37:18.578767700Z&quot;,&quot;start_time&quot;:&quot;2023-10-27T04:37:18.424856600Z&quot;}" data-execution_count="28">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>lin_reg <span class="op">=</span> make_pipeline(preprocessor, LinearRegression())</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>lin_reg.fit(diamonds_features_train, diamonds_price_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="28">
+<p>We have built our pre-processing pipeline that will take care of both numerical and categorical features in our dataset. It will impute any missing values in the numerical columns and scale the features using StandardScaler(). In the case of categorical features, it will encode each unique value in carat, color, and cut to a numerical value. Let us now split the dataset into a train and test set for training and validation steps and train a linear regression model</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-07T23:58:06.573538800Z&quot;,&quot;start_time&quot;:&quot;2023-12-07T23:58:06.417763800Z&quot;}" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>diamonds_features, diamonds_price <span class="op">=</span> diamonds.loc[:, diamonds.columns <span class="op">!=</span> <span class="st">'price'</span>], diamonds[<span class="st">'price'</span>]</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>diamonds_features_train, diamonds_features_test, diamonds_price_train, diamonds_price_test <span class="op">=</span> train_test_split(diamonds_features, diamonds_price, test_size<span class="op">=</span><span class="fl">0.25</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>lin_reg <span class="op">=</span> make_pipeline(preprocessor, LinearRegression())</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>lin_reg.fit(diamonds_features_train, diamonds_price_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
 
 <style>#sk-container-id-1 {color: black;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[('columntransformer',
                  ColumnTransformer(transformers=[('num',
@@ -920,56 +392,44 @@ Name: price, dtype: float64</code></pre>
                   verbose_feature_names_out=False)</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox"><label for="sk-estimator-id-3" class="sk-toggleable__label sk-toggleable__label-arrow">num</label><div class="sk-toggleable__content"><pre>['x', 'y', 'z', 'carat', 'depth', 'table']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-4" type="checkbox"><label for="sk-estimator-id-4" class="sk-toggleable__label sk-toggleable__label-arrow">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer(strategy='median')</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-5" type="checkbox"><label for="sk-estimator-id-5" class="sk-toggleable__label sk-toggleable__label-arrow">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-6" type="checkbox"><label for="sk-estimator-id-6" class="sk-toggleable__label sk-toggleable__label-arrow">cat</label><div class="sk-toggleable__content"><pre>['cut', 'color', 'clarity']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-7" type="checkbox"><label for="sk-estimator-id-7" class="sk-toggleable__label sk-toggleable__label-arrow">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore', sparse_output=False)</pre></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-8" type="checkbox"><label for="sk-estimator-id-8" class="sk-toggleable__label sk-toggleable__label-arrow">LinearRegression</label><div class="sk-toggleable__content"><pre>LinearRegression()</pre></div></div></div></div></div></div></div>
 </div>
 </div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-27T04:38:05.886747500Z&quot;,&quot;start_time&quot;:&quot;2023-10-27T04:38:05.823902900Z&quot;}" data-execution_count="29">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>lin_reg[:<span class="op">-</span><span class="dv">1</span>].get_feature_names_out()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="29">
-<pre><code>array(['x', 'y', 'z', 'carat', 'depth', 'table', 'cut_Fair', 'cut_Good',
-       'cut_Ideal', 'cut_Premium', 'cut_Very Good', 'color_D', 'color_E',
-       'color_F', 'color_G', 'color_H', 'color_I', 'color_J',
-       'clarity_I1', 'clarity_IF', 'clarity_SI1', 'clarity_SI2',
-       'clarity_VS1', 'clarity_VS2', 'clarity_VVS1', 'clarity_VVS2'],
-      dtype=object)</code></pre>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-27T04:38:49.389348800Z&quot;,&quot;start_time&quot;:&quot;2023-10-27T04:38:49.006543500Z&quot;}" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>lin_reg_input_features <span class="op">=</span> lin_reg[:<span class="op">-</span><span class="dv">1</span>].get_feature_names_out()</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>pd.Series(lin_reg[<span class="op">-</span><span class="dv">1</span>].coef_.ravel(), index<span class="op">=</span>lin_reg_input_features).plot.bar()</span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="index_files/figure-html/cell-31-output-1.png" width="657" height="465"></p>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-27T04:39:03.362019500Z&quot;,&quot;start_time&quot;:&quot;2023-10-27T04:39:03.317344800Z&quot;}" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>diamonds_price_predictor <span class="op">=</span> lin_reg.predict(diamonds_features_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-27T04:39:05.682923900Z&quot;,&quot;start_time&quot;:&quot;2023-10-27T04:39:05.650950500Z&quot;}" data-execution_count="32">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>lin_reg[<span class="op">-</span><span class="dv">1</span>].coef_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="32">
-<pre><code>array([-1.15536381e+03,  1.65368764e+01, -2.61617854e+01,  5.34059728e+03,
-       -9.01199449e+01, -6.26944183e+01, -5.22404226e+14, -5.22404226e+14,
-       -5.22404226e+14, -5.22404226e+14, -5.22404226e+14,  2.10763700e+15,
-        2.10763700e+15,  2.10763700e+15,  2.10763700e+15,  2.10763700e+15,
-        2.10763700e+15,  2.10763700e+15,  1.19616653e+15,  1.19616653e+15,
-        1.19616653e+15,  1.19616653e+15,  1.19616653e+15,  1.19616653e+15,
-        1.19616653e+15,  1.19616653e+15])</code></pre>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-27T04:39:10.101743800Z&quot;,&quot;start_time&quot;:&quot;2023-10-27T04:39:10.073130800Z&quot;}" data-execution_count="33">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error, r2_score</span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Mean Squared Error: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> mean_squared_error(diamonds_price_test, diamonds_price_predictor))</span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficient of Determination: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> r2_score(diamonds_price_test, diamonds_price_predictor))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We can make now make predictions using this trained model on our test samples. We can also visualize the coefficients (weights/parmaeters) of the features using the coef_ argument of the model.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-08T00:18:22.083901400Z&quot;,&quot;start_time&quot;:&quot;2023-12-08T00:18:22.068192100Z&quot;}" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>diamonds_price_predictions <span class="op">=</span> lin_reg.predict(diamonds_features_test)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Weights/Coefficients of predictors:</span><span class="ch">\n</span><span class="ss"> </span><span class="sc">{</span>lin_reg[<span class="dv">1</span>]<span class="sc">.</span>coef_<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Mean Squared Error: 1302489.42
+<pre><code>Weights/Coefficients of predictors:
+ [-1.12214604e+03 -7.58651029e+00 -3.87052183e+01  5.35443160e+03
+ -9.47686212e+01 -6.07747279e+01 -7.12019153e+14 -7.12019153e+14
+ -7.12019153e+14 -7.12019153e+14 -7.12019153e+14 -8.01643503e+14
+ -8.01643503e+14 -8.01643503e+14 -8.01643503e+14 -8.01643503e+14
+ -8.01643503e+14 -8.01643503e+14 -1.01747840e+15 -1.01747840e+15
+ -1.01747840e+15 -1.01747840e+15 -1.01747840e+15 -1.01747840e+15
+ -1.01747840e+15 -1.01747840e+15]</code></pre>
+</div>
+</div>
+<p>We can see the performance of our model using these predictions and actual response variable values. The <strong><em>mean_squared_error</em></strong> and <strong><em>r2_score</em></strong> (also called coefficient of determination) tells us how well the model has performed on the test set. The R2 score provides the information about the goodness of fit of a model, that is, how well a regression line approximates the actual data.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-08T00:36:39.611417Z&quot;,&quot;start_time&quot;:&quot;2023-12-08T00:36:39.595820100Z&quot;}" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error, r2_score</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Mean Squared Error: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> mean_squared_error(diamonds_price_test, diamonds_price_predictions))</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficient of Determination: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> r2_score(diamonds_price_test, diamonds_price_predictions))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean Squared Error: 1285799.99
 Coefficient of Determination: 0.92</code></pre>
 </div>
 </div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-27T04:42:29.514113800Z&quot;,&quot;start_time&quot;:&quot;2023-10-27T04:42:27.577839400Z&quot;}" data-execution_count="34">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> SGDRegressor</span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>sgd_reg <span class="op">=</span> make_pipeline(preprocessor, SGDRegressor(max_iter<span class="op">=</span><span class="dv">1000</span>, tol<span class="op">=</span><span class="fl">1e-5</span>, penalty<span class="op">=</span><span class="va">None</span>, eta0<span class="op">=</span><span class="fl">0.01</span>, n_iter_no_change<span class="op">=</span><span class="dv">100</span>, random_state<span class="op">=</span><span class="dv">42</span>))</span>
-<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>sgd_reg.fit(diamonds_features_train, diamonds_price_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="34">
+<p>As we can see from above, the linear regression model we trained is able to account for 92% of the variance that’s explained by the independent variables in our dataset. Which is good, but let us see how we can take that value up while also minimizing the mean squared error using non-linear regression technique like Random Forest Regressor.</p>
+</section>
+<section id="random-forests" class="level2">
+<h2 class="anchored" data-anchor-id="random-forests">3. Random Forests</h2>
+<p>Random Forest is an ensemble learning technique. Instead of training a single regressor or classifier, we will train an ensemble of models and choose the prediction that is averaged over all the models. The method used to train this ensemble model is called <strong>bagging</strong>, short for <em>bootstrap aggregating</em>. In bagging a single algorithm is chosen as the algorithm that all the models will use but each model will train on a random subset (with replacement) of the overall dataset. Once all the predictors are trained, the ensemble can make the prediction for an instance by simply aggregating the predictions of all the predictors. For regression problems, the aggregation function is usually average. The advantage of such a process is that its decision is based on multiple models rather than a single model - so its calculations are reliable and more accurate than individual predictor. Additionally, the ensemble has lower variance than a single predictor.</p>
+<p>Let us train a Random Forest Regressor to predict the diamonds price.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-08T02:08:34.805998300Z&quot;,&quot;start_time&quot;:&quot;2023-12-08T02:07:57.848591200Z&quot;}" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestRegressor</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>rfr_reg <span class="op">=</span> make_pipeline(preprocessor, RandomForestRegressor())</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>rfr_reg.fit(diamonds_features_train, diamonds_price_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
 
 <style>#sk-container-id-2 {color: black;}#sk-container-id-2 pre{padding: 0;}#sk-container-id-2 div.sk-toggleable {background-color: white;}#sk-container-id-2 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-2 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-2 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-2 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-2 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-2 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-2 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-2 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-2 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-2 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-2 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-2 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-2 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-2 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-2 div.sk-item {position: relative;z-index: 1;}#sk-container-id-2 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-2 div.sk-item::before, #sk-container-id-2 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-2 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-2 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-2 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-2 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-2 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-2 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-2 div.sk-label-container {text-align: center;}#sk-container-id-2 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-2 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-2" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[('columntransformer',
                  ColumnTransformer(transformers=[('num',
@@ -984,9 +444,7 @@ Coefficient of Determination: 0.92</code></pre>
                                                                 sparse_output=False),
                                                   ['cut', 'color', 'clarity'])],
                                    verbose_feature_names_out=False)),
-                ('sgdregressor',
-                 SGDRegressor(n_iter_no_change=100, penalty=None,
-                              random_state=42, tol=1e-05))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-9" type="checkbox"><label for="sk-estimator-id-9" class="sk-toggleable__label sk-toggleable__label-arrow">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[('columntransformer',
+                ('randomforestregressor', RandomForestRegressor())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-9" type="checkbox"><label for="sk-estimator-id-9" class="sk-toggleable__label sk-toggleable__label-arrow">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[('columntransformer',
                  ColumnTransformer(transformers=[('num',
                                                   Pipeline(steps=[('simpleimputer',
                                                                    SimpleImputer(strategy='median')),
@@ -999,9 +457,7 @@ Coefficient of Determination: 0.92</code></pre>
                                                                 sparse_output=False),
                                                   ['cut', 'color', 'clarity'])],
                                    verbose_feature_names_out=False)),
-                ('sgdregressor',
-                 SGDRegressor(n_iter_no_change=100, penalty=None,
-                              random_state=42, tol=1e-05))])</pre></div></div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-10" type="checkbox"><label for="sk-estimator-id-10" class="sk-toggleable__label sk-toggleable__label-arrow">columntransformer: ColumnTransformer</label><div class="sk-toggleable__content"><pre>ColumnTransformer(transformers=[('num',
+                ('randomforestregressor', RandomForestRegressor())])</pre></div></div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-10" type="checkbox"><label for="sk-estimator-id-10" class="sk-toggleable__label sk-toggleable__label-arrow">columntransformer: ColumnTransformer</label><div class="sk-toggleable__content"><pre>ColumnTransformer(transformers=[('num',
                                  Pipeline(steps=[('simpleimputer',
                                                   SimpleImputer(strategy='median')),
                                                  ('standardscaler',
@@ -1011,79 +467,23 @@ Coefficient of Determination: 0.92</code></pre>
                                  OneHotEncoder(handle_unknown='ignore',
                                                sparse_output=False),
                                  ['cut', 'color', 'clarity'])],
-                  verbose_feature_names_out=False)</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-11" type="checkbox"><label for="sk-estimator-id-11" class="sk-toggleable__label sk-toggleable__label-arrow">num</label><div class="sk-toggleable__content"><pre>['x', 'y', 'z', 'carat', 'depth', 'table']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-12" type="checkbox"><label for="sk-estimator-id-12" class="sk-toggleable__label sk-toggleable__label-arrow">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer(strategy='median')</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-13" type="checkbox"><label for="sk-estimator-id-13" class="sk-toggleable__label sk-toggleable__label-arrow">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-14" type="checkbox"><label for="sk-estimator-id-14" class="sk-toggleable__label sk-toggleable__label-arrow">cat</label><div class="sk-toggleable__content"><pre>['cut', 'color', 'clarity']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-15" type="checkbox"><label for="sk-estimator-id-15" class="sk-toggleable__label sk-toggleable__label-arrow">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore', sparse_output=False)</pre></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-16" type="checkbox"><label for="sk-estimator-id-16" class="sk-toggleable__label sk-toggleable__label-arrow">SGDRegressor</label><div class="sk-toggleable__content"><pre>SGDRegressor(n_iter_no_change=100, penalty=None, random_state=42, tol=1e-05)</pre></div></div></div></div></div></div></div>
+                  verbose_feature_names_out=False)</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-11" type="checkbox"><label for="sk-estimator-id-11" class="sk-toggleable__label sk-toggleable__label-arrow">num</label><div class="sk-toggleable__content"><pre>['x', 'y', 'z', 'carat', 'depth', 'table']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-12" type="checkbox"><label for="sk-estimator-id-12" class="sk-toggleable__label sk-toggleable__label-arrow">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer(strategy='median')</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-13" type="checkbox"><label for="sk-estimator-id-13" class="sk-toggleable__label sk-toggleable__label-arrow">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-14" type="checkbox"><label for="sk-estimator-id-14" class="sk-toggleable__label sk-toggleable__label-arrow">cat</label><div class="sk-toggleable__content"><pre>['cut', 'color', 'clarity']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-15" type="checkbox"><label for="sk-estimator-id-15" class="sk-toggleable__label sk-toggleable__label-arrow">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore', sparse_output=False)</pre></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-16" type="checkbox"><label for="sk-estimator-id-16" class="sk-toggleable__label sk-toggleable__label-arrow">RandomForestRegressor</label><div class="sk-toggleable__content"><pre>RandomForestRegressor()</pre></div></div></div></div></div></div></div>
 </div>
 </div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-27T04:46:31.440390200Z&quot;,&quot;start_time&quot;:&quot;2023-10-27T04:46:31.392768Z&quot;}" data-execution_count="35">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>price_predictor_sgd <span class="op">=</span> sgd_reg.predict(diamonds_features_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-27T04:47:14.753844800Z&quot;,&quot;start_time&quot;:&quot;2023-10-27T04:47:14.674575800Z&quot;}" data-execution_count="36">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Mean Squared Error: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> mean_squared_error(diamonds_price_test, price_predictor_sgd))</span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficient of Determination: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> r2_score(diamonds_price_test, price_predictor_sgd))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now that we trained the RandomForestRegressor, let us make predictions using it and evaluate its performance by calculating mean squared error and r2_score.</p>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-12-08T02:25:18.664305200Z&quot;,&quot;start_time&quot;:&quot;2023-12-08T02:25:18.327114700Z&quot;}" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>price_predictor_rfr <span class="op">=</span> rfr_reg.predict(diamonds_features_test)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Mean Squared Error: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> mean_squared_error(diamonds_price_test, price_predictor_rfr))</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficient of Determination: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> r2_score(diamonds_price_test, price_predictor_rfr))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Mean Squared Error: 1303050.80
-Coefficient of Determination: 0.92</code></pre>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-27T04:52:16.717464500Z&quot;,&quot;start_time&quot;:&quot;2023-10-27T04:51:28.881451600Z&quot;}" data-execution_count="37">
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestRegressor</span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>rfr_reg <span class="op">=</span> make_pipeline(preprocessor, RandomForestRegressor())</span>
-<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>rfr_reg.fit(diamonds_features_train, diamonds_price_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="37">
-
-<style>#sk-container-id-3 {color: black;}#sk-container-id-3 pre{padding: 0;}#sk-container-id-3 div.sk-toggleable {background-color: white;}#sk-container-id-3 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-3 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-3 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-3 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-3 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-3 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-3 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-3 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-3 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-3 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-3 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-3 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-3 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-3 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-3 div.sk-item {position: relative;z-index: 1;}#sk-container-id-3 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-3 div.sk-item::before, #sk-container-id-3 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-3 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-3 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-3 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-3 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-3 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-3 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-3 div.sk-label-container {text-align: center;}#sk-container-id-3 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-3 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-3" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[('columntransformer',
-                 ColumnTransformer(transformers=[('num',
-                                                  Pipeline(steps=[('simpleimputer',
-                                                                   SimpleImputer(strategy='median')),
-                                                                  ('standardscaler',
-                                                                   StandardScaler())]),
-                                                  ['x', 'y', 'z', 'carat',
-                                                   'depth', 'table']),
-                                                 ('cat',
-                                                  OneHotEncoder(handle_unknown='ignore',
-                                                                sparse_output=False),
-                                                  ['cut', 'color', 'clarity'])],
-                                   verbose_feature_names_out=False)),
-                ('randomforestregressor', RandomForestRegressor())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-17" type="checkbox"><label for="sk-estimator-id-17" class="sk-toggleable__label sk-toggleable__label-arrow">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[('columntransformer',
-                 ColumnTransformer(transformers=[('num',
-                                                  Pipeline(steps=[('simpleimputer',
-                                                                   SimpleImputer(strategy='median')),
-                                                                  ('standardscaler',
-                                                                   StandardScaler())]),
-                                                  ['x', 'y', 'z', 'carat',
-                                                   'depth', 'table']),
-                                                 ('cat',
-                                                  OneHotEncoder(handle_unknown='ignore',
-                                                                sparse_output=False),
-                                                  ['cut', 'color', 'clarity'])],
-                                   verbose_feature_names_out=False)),
-                ('randomforestregressor', RandomForestRegressor())])</pre></div></div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-18" type="checkbox"><label for="sk-estimator-id-18" class="sk-toggleable__label sk-toggleable__label-arrow">columntransformer: ColumnTransformer</label><div class="sk-toggleable__content"><pre>ColumnTransformer(transformers=[('num',
-                                 Pipeline(steps=[('simpleimputer',
-                                                  SimpleImputer(strategy='median')),
-                                                 ('standardscaler',
-                                                  StandardScaler())]),
-                                 ['x', 'y', 'z', 'carat', 'depth', 'table']),
-                                ('cat',
-                                 OneHotEncoder(handle_unknown='ignore',
-                                               sparse_output=False),
-                                 ['cut', 'color', 'clarity'])],
-                  verbose_feature_names_out=False)</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-19" type="checkbox"><label for="sk-estimator-id-19" class="sk-toggleable__label sk-toggleable__label-arrow">num</label><div class="sk-toggleable__content"><pre>['x', 'y', 'z', 'carat', 'depth', 'table']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-20" type="checkbox"><label for="sk-estimator-id-20" class="sk-toggleable__label sk-toggleable__label-arrow">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer(strategy='median')</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-21" type="checkbox"><label for="sk-estimator-id-21" class="sk-toggleable__label sk-toggleable__label-arrow">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-22" type="checkbox"><label for="sk-estimator-id-22" class="sk-toggleable__label sk-toggleable__label-arrow">cat</label><div class="sk-toggleable__content"><pre>['cut', 'color', 'clarity']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-23" type="checkbox"><label for="sk-estimator-id-23" class="sk-toggleable__label sk-toggleable__label-arrow">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore', sparse_output=False)</pre></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-24" type="checkbox"><label for="sk-estimator-id-24" class="sk-toggleable__label sk-toggleable__label-arrow">RandomForestRegressor</label><div class="sk-toggleable__content"><pre>RandomForestRegressor()</pre></div></div></div></div></div></div></div>
-</div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-27T04:52:22.477783800Z&quot;,&quot;start_time&quot;:&quot;2023-10-27T04:52:22.047258400Z&quot;}" data-execution_count="38">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>price_predictor_rfr <span class="op">=</span> rfr_reg.predict(diamonds_features_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2023-10-27T04:52:38.698920Z&quot;,&quot;start_time&quot;:&quot;2023-10-27T04:52:38.651693800Z&quot;}" data-execution_count="39">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Mean Squared Error: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> mean_squared_error(diamonds_price_test, price_predictor_rfr))</span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficient of Determination: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> r2_score(diamonds_price_test, price_predictor_rfr))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Mean Squared Error: 307524.19
+<pre><code>Mean Squared Error: 306066.73
 Coefficient of Determination: 0.98</code></pre>
 </div>
 </div>
+<p>Great! the random forest regressor is able to approximate the actual data much better than the linear regression model we built earlier. Also, the mean squared error is reduced by huge margin. Random Forest is more flexible than linear regression which tries to fit a line to the data while a non-linear regression technique like Decision Trees and Random Forests uses a curve to show association.</p>
 
 
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
