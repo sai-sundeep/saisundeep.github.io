@@ -4,6 +4,7 @@ author: "Sai Sundeep Rayidi"
 date: "2023-12-05"
 categories: [Linear Regression, Non-Linear Regression]
 jupyter: python3
+image: "regression.png"
 format:
   html:
     code-fold: False

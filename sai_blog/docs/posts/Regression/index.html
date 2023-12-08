@@ -104,7 +104,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="../../styles.css">
 <meta property="og:title" content="Sai’s ML blog - Predicting Continuous Variables using Regression Analysis - Linear and Non-Linear Regression">
 <meta property="og:description" content="">
-<meta property="og:image" content="index_files/figure-html/cell-4-output-1.png">
+<meta property="og:image" content="regression.png">
 <meta property="og:site-name" content="Sai's ML blog">
 </head>
 
@@ -396,13 +396,13 @@ Name: price, dtype: float64</code></pre>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Weights/Coefficients of predictors:</span><span class="ch">\n</span><span class="ss"> </span><span class="sc">{</span>lin_reg[<span class="dv">1</span>]<span class="sc">.</span>coef_<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Weights/Coefficients of predictors:
- [-1.12214604e+03 -7.58651029e+00 -3.87052183e+01  5.35443160e+03
- -9.47686212e+01 -6.07747279e+01 -7.12019153e+14 -7.12019153e+14
- -7.12019153e+14 -7.12019153e+14 -7.12019153e+14 -8.01643503e+14
- -8.01643503e+14 -8.01643503e+14 -8.01643503e+14 -8.01643503e+14
- -8.01643503e+14 -8.01643503e+14 -1.01747840e+15 -1.01747840e+15
- -1.01747840e+15 -1.01747840e+15 -1.01747840e+15 -1.01747840e+15
- -1.01747840e+15 -1.01747840e+15]</code></pre>
+ [-1.56231024e+03  5.27637997e+02 -5.37870482e+01  5.26055155e+03
+ -8.86441962e+01 -6.35762425e+01 -8.69307213e+14 -8.69307213e+14
+ -8.69307213e+14 -8.69307213e+14 -8.69307213e+14  1.09282256e+15
+  1.09282256e+15  1.09282256e+15  1.09282256e+15  1.09282256e+15
+  1.09282256e+15  1.09282256e+15 -3.01470391e+15 -3.01470391e+15
+ -3.01470391e+15 -3.01470391e+15 -3.01470391e+15 -3.01470391e+15
+ -3.01470391e+15 -3.01470391e+15]</code></pre>
 </div>
 </div>
 <p>We can see the performance of our model using these predictions and actual response variable values. The <strong><em>mean_squared_error</em></strong> and <strong><em>r2_score</em></strong> (also called coefficient of determination) tells us how well the model has performed on the test set. The R2 score provides the information about the goodness of fit of a model, that is, how well a regression line approximates the actual data.</p>
@@ -412,7 +412,7 @@ Name: price, dtype: float64</code></pre>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Mean Squared Error: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> mean_squared_error(diamonds_price_test, diamonds_price_predictions))</span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficient of Determination: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> r2_score(diamonds_price_test, diamonds_price_predictions))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Mean Squared Error: 1285799.99
+<pre><code>Mean Squared Error: 1279693.65
 Coefficient of Determination: 0.92</code></pre>
 </div>
 </div>
@@ -474,7 +474,7 @@ Coefficient of Determination: 0.92</code></pre>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Mean Squared Error: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> mean_squared_error(diamonds_price_test, price_predictor_rfr))</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficient of Determination: </span><span class="sc">%.2f</span><span class="st">"</span> <span class="op">%</span> r2_score(diamonds_price_test, price_predictor_rfr))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Mean Squared Error: 306066.73
+<pre><code>Mean Squared Error: 297054.80
 Coefficient of Determination: 0.98</code></pre>
 </div>
 </div>
